@@ -5,12 +5,14 @@ plugins {
 
 android {
     namespace = "com.bytecoder.vplay"
-    compileSdk = 36
-
+    compileSdk = 35
+    buildFeatures {
+        dataBinding=true
+    }
     defaultConfig {
         applicationId = "com.bytecoder.vplay"
-        minSdk = 36
-        targetSdk = 36
+        minSdk = 35
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -45,4 +47,9 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    implementation("com.google.android.exoplayer:exoplayer:2.19.1")
+    //HLS, DASH, etc.
+    implementation("com.google.android.exoplayer:exoplayer-hls:2.19.1")
+
 }
