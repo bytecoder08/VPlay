@@ -5,14 +5,14 @@ plugins {
 
 android {
     namespace = "com.bytecoder.vplay"
-    compileSdk = 35
+    compileSdk = 36
     buildFeatures {
         dataBinding=true
     }
     defaultConfig {
         applicationId = "com.bytecoder.vplay"
-        minSdk = 35
-        targetSdk = 35
+        minSdk = 26
+        targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
