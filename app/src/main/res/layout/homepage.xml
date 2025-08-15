@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="#FAFAFA">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- App Title -->
+        <TextView
+            android:id="@+id/tvHomeTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="VPlay"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:paddingBottom="24dp" />
+
+        <!-- Videos -->
+        <Button
+            android:id="@+id/btnVideos"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🎬 Videos"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Music -->
+        <Button
+            android:id="@+id/btnMusic"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🎵 Music"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Online -->
+        <Button
+            android:id="@+id/btnOnline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🌐 Online"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Playlists -->
+        <Button
+            android:id="@+id/btnPlaylists"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📂 Playlists"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Options -->
+        <Button
+            android:id="@+id/btnOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="⚙ Options"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Settings -->
+        <Button
+            android:id="@+id/btnSettings"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔧 Settings"
+            android:layout_marginBottom="12dp" />
+
+        <!-- Permissions -->
+        <Button
+            android:id="@+id/btnPermissions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔑 Permissions" />
+
+    </LinearLayout>
+</ScrollView>

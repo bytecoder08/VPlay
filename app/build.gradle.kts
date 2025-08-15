@@ -7,7 +7,8 @@ android {
     namespace = "com.bytecoder.vplay"
     compileSdk = 36
     buildFeatures {
-        dataBinding=true
+        dataBinding = true
+        viewBinding = true
     }
     defaultConfig {
         applicationId = "com.bytecoder.vplay"
@@ -51,5 +52,6 @@ dependencies {
     implementation("com.google.android.exoplayer:exoplayer:2.19.1")
     //HLS, DASH, etc.
     implementation("com.google.android.exoplayer:exoplayer-hls:2.19.1")
+    implementation("com.google.android.exoplayer:exoplayer-ui:2.19.1")
 
 }
