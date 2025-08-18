@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- Search -->
+    <item
+        android:id="@+id/action_search"
+        android:title="Search"
+        android:icon="@android:drawable/ic_menu_search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="always|collapseActionView" />
+
+    <!-- Sort -->
+    <item
+        android:id="@+id/action_sort"
+        android:title="Sort"
+        android:icon="@android:drawable/ic_menu_sort_alphabetically"
+        app:showAsAction="ifRoom" />
+
+    <!-- Filter -->
+    <item
+        android:id="@+id/action_filter"
+        android:title="Filter"
+        android:icon="@android:drawable/ic_menu_manage"
+        app:showAsAction="ifRoom" />
+
+    <!-- Overflow menu -->
+    <item
+        android:id="@+id/action_more"
+        android:title="More"
+        android:icon="@android:drawable/ic_menu_more"
+        app:showAsAction="never" />
+</menu>

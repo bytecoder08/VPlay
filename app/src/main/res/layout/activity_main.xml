@@ -1,16 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:layout_height="match_parent">
 
-    <com.google.android.exoplayer2.ui.PlayerView
-        android:id="@+id/playerView"
+    <!-- Content area for fragments -->
+    <FrameLayout
+        android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:keepScreenOn="true"
-        app:show_buffering="when_playing"
-        app:use_controller="true" />
+        android:layout_weight="1" />
 
+    <!-- Actions row (Search / Filter / Sort / More) -->
+    <LinearLayout
+        android:id="@+id/actionsRow"
+        android:padding="8dp"
+        android:orientation="horizontal"
+        android:gravity="end|center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ImageButton
+            android:id="@+id/actionSearch"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="Search"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/search_24px" />
+
+        <ImageButton
+            android:id="@+id/actionFilter"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="Filter"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/filter_list_24px" />
+
+        <ImageButton
+            android:id="@+id/actionSort"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="Sort"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/sort_24px" />
+
+        <ImageButton
+            android:id="@+id/actionMore"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:contentDescription="More"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@drawable/more_vert_24px" />
+    </LinearLayout>
+
+    <!-- Bottom Navigation -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:menu="@menu/bottom_nav_menu" />
 </LinearLayout>

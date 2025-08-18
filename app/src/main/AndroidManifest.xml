@@ -19,7 +19,7 @@
         android:theme="@style/Theme.VPlay">
 
         <activity
-            android:name=".SplashScreen"
+            android:name=".activities.SplashScreen"
             android:exported="true"
             android:theme="@style/Theme.VPlay">
              <intent-filter>
@@ -29,39 +29,17 @@
              </intent-filter>
         </activity>
 
+
         <activity
-            android:name=".Homepage"
+            android:name=".activities.MainActivity"
             android:exported="true"/>
         <activity
-            android:name=".MainActivity"
+            android:name=".player.VideoPlayer"
             android:exported="true"/>
         <activity
-            android:name=".GetPermissions"
+            android:name=".player.MusicPlayer"
             android:exported="true"/>
-        <activity
-            android:name=".VideoList"
-            android:exported="true"/>
-        <activity
-            android:name=".MusicList"
-            android:exported="true"/>
-        <activity
-            android:name=".Playlists"
-            android:exported="true"/>
-        <activity
-            android:name=".Online"
-            android:exported="true"/>
-        <activity
-            android:name=".Settings"
-            android:exported="true"/>
-        <activity
-            android:name=".VideoPlayer"
-            android:exported="true"/>
-        <activity
-            android:name=".MusicPlayer"
-            android:exported="true"/>
-        <activity
-            android:name=".Options"
-            android:exported="true"/>
+
     </application>
 
 </manifest>

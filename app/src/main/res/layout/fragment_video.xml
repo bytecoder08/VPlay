@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- Toolbar for actions -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:title="Videos"
+        android:titleTextColor="@android:color/white" />
+
+    <!-- Toggle button + Recycler -->
+    <ImageButton
+        android:id="@+id/btnToggleView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:src="@drawable/grid_view_24px"
+        android:contentDescription="Toggle Layout"
+        android:padding="8dp"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerVideos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp"/>
+</LinearLayout>

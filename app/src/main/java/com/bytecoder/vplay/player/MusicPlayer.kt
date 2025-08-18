@@ -1,4 +1,4 @@
-package com.bytecoder.vplay
+package com.bytecoder.vplay.player
 
 import android.net.Uri
 import android.os.Bundle

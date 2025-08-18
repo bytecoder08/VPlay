@@ -1,4 +1,4 @@
-package com.bytecoder.vplay
+package com.bytecoder.vplay.player
 
 import android.content.pm.ActivityInfo
 import android.net.Uri
@@ -10,6 +10,7 @@ import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.ui.PlayerView
+import com.bytecoder.vplay.R
 
 class VideoPlayer : AppCompatActivity() {
     private var player: ExoPlayer? = null
