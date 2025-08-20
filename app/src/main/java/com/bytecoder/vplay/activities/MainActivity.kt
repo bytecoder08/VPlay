@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bytecoder.vplay.fragments.OnlineFragment
 import com.bytecoder.vplay.R
+import com.bytecoder.vplay.fragments.ExplorerFragment
 import com.bytecoder.vplay.fragments.OptionsFragment
 import com.bytecoder.vplay.fragments.MusicFragment
 import com.bytecoder.vplay.fragments.PlaylistFragment

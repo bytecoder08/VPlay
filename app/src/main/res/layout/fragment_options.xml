@@ -3,7 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp">
+    >
 
     <!-- Toolbar -->
     <androidx.appcompat.widget.Toolbar
@@ -16,6 +16,7 @@
 
     <!-- Explorer Button -->
     <LinearLayout
+
         android:id="@+id/btnExplorer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
