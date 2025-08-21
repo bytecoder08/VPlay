@@ -29,6 +29,9 @@ class OptionsFragment : Fragment() {
         view.findViewById<LinearLayout>(R.id.btnSettings).setOnClickListener {
             activity.loadFragment(SettingsFragment())
         }
+        view.findViewById<LinearLayout>(R.id.btnPermissions).setOnClickListener {
+            activity.loadFragment(PermissionsFragment())
+        }
         view.findViewById<LinearLayout>(R.id.btnFeedback).setOnClickListener {
             activity.loadFragment(FeedbackFragment())
         }

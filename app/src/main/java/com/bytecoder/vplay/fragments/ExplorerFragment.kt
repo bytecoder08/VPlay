@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.adapters.ExplorerAdapter
 import java.io.File
+import kotlin.collections.toList
 
 class ExplorerFragment : Fragment() {
 
@@ -61,21 +62,11 @@ class ExplorerFragment : Fragment() {
         )
     }
 
-//    private fun openFolder(folder: File) {
-//        currentDir = folder
-//        val files: List<File> = folder.listFiles()
-//            ?.sortedBy { it.name.lowercase() }
-//            ?.toList()
-//            ?: emptyList()
-//
-//        adapter.updateData(files)
-//    }
     private fun openFolder(folder: File) {
         currentDir = folder
-        val files = folder.listFiles()?.sortedBy { it.name.lowercase() } ?: emptyArray()
-        adapter.updateData(files.toList())
+        val files = folder.listFiles()?.sortedBy { it.name.lowercase() } ?.toList()?:emptyList()
+        adapter.updateData(files)
     }
-
 
     private fun goBack(): Boolean {
         currentDir?.parentFile?.let { parent ->

@@ -1,23 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
+    android:background="?android:attr/colorBackground"
     android:padding="24dp">
 
     <TextView
-        android:text="This app needs storage permissions to play videos and music."
-        android:textSize="18sp"
-        android:gravity="center"
-        android:layout_marginBottom="20dp"
+        android:id="@+id/tvPermissionInfo"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="260dp"
+        android:layout_marginBottom="24dp"
+        android:gravity="center"
+        android:text="This app needs storage permissions to play videos and music. It also requires notification permission to send playback alerts."
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="16sp" />
 
     <Button
         android:id="@+id/btnGrantPermissions"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Grant Permissions" />
+        android:text="Grant Permissions"
+        android:padding="12dp"
+        android:textAllCaps="false"
+        android:backgroundTint="?attr/colorPrimary"
+        android:textColor="@android:color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentStart="true"/>
 
-</LinearLayout>
+    <!-- Skip Button -->
+    <Button
+        android:id="@+id/btnSkipPermissions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Skip"
+        android:textAllCaps="false"
+        android:backgroundTint="?attr/colorPrimary"
+        android:textColor="@android:color/white"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:padding="12dp"/>
+
+</RelativeLayout>

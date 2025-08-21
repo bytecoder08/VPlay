@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?android:attr/colorBackground">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?android:attr/colorBackground"
+        android:title="Explorer"
+        android:titleTextColor="@android:color/white" />
+
+    <!-- Header -->
+    <TextView
+        android:id="@+id/tvPermissionsHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="App Permissions"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"
+        android:gravity="center"
+        android:layout_margin="16dp"/>
+
+    <!-- Scrollable container for permissions -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_margin="16dp">
+
+        <LinearLayout
+            android:id="@+id/permissionsContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical" />
+
+    </ScrollView>
+
+    <!-- Allow Permissions Button -->
+    <Button
+        android:id="@+id/btnAllowPermissions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Allow Permissions"
+        android:backgroundTint="?attr/colorPrimary"
+        android:textColor="@android:color/white"
+        android:textAllCaps="false"
+        android:padding="12dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:layout_margin="16dp"/>
+
+</LinearLayout>
