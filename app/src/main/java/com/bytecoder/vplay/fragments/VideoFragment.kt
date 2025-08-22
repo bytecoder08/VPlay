@@ -1,31 +1,32 @@
 package com.bytecoder.vplay.fragments
 
+import android.content.ContentUris
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.provider.MediaStore
+import android.view.*
 import android.widget.ImageButton
-import androidx.appcompat.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
-import androidx.appcompat.widget.Toolbar
 import com.bytecoder.vplay.adapters.VideoAdapter
-
+import com.bytecoder.vplay.model.MediaItem
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class VideoFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var toggleButton: ImageButton
     private var isGrid = false
-    private val items = List(20) { "Video Item ${it+1}" }
+    private lateinit var adapter: VideoAdapter
+    private val data = mutableListOf<MediaItem>()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,10 +36,27 @@ class VideoFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerVideos)
         toggleButton = view.findViewById(R.id.btnToggleView)
 
+        adapter = VideoAdapter(
+            items = emptyList(),
+            isGrid = isGrid,
+            contentResolver = requireContext().contentResolver
+        ) { item ->
+            Toast.makeText(requireContext(), "Play: ${item.displayName}", Toast.LENGTH_SHORT).show()
+            // TODO: start your VideoPlayer with item.uri
+        }
+
         setupRecycler()
         toggleButton.setOnClickListener { toggleLayout() }
+        loadVideos()
 
         return view
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val toolbar: Toolbar = view.findViewById(R.id.toolbar)
+        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
+        setHasOptionsMenu(true)
     }
 
     private fun setupRecycler() {
@@ -47,7 +65,7 @@ class VideoFragment : Fragment() {
         } else {
             LinearLayoutManager(requireContext())
         }
-        recyclerView.adapter = VideoAdapter(items, isGrid)
+        recyclerView.adapter = adapter
 
         toggleButton.setImageResource(
             if (isGrid) R.drawable.list_24px else R.drawable.grid_view_24px
@@ -57,50 +75,66 @@ class VideoFragment : Fragment() {
     private fun toggleLayout() {
         isGrid = !isGrid
         setupRecycler()
+        adapter.setGrid(isGrid)
     }
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
-        val toolbar: Toolbar = view.findViewById(R.id.toolbar)
-        (requireActivity() as AppCompatActivity).setSupportActionBar(toolbar)
-        setHasOptionsMenu(true)
-    }
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.main_menu, menu)
-
-        // Setup search
-        val searchItem = menu.findItem(R.id.action_search)
-        val searchView = searchItem.actionView as SearchView
-        searchView.queryHint = "Search Videos"
-        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
-            override fun onQueryTextSubmit(query: String?): Boolean {
-                // TODO: filter adapter
-                return false
+    private fun loadVideos() {
+        lifecycleScope.launch {
+            val items = withContext(Dispatchers.IO) {
+                queryVideos()
             }
-            override fun onQueryTextChange(newText: String?): Boolean {
-                // TODO: live filter adapter
-                return false
-            }
-        })
-    }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_sort -> {
-                // TODO: sorting logic
-                true
-            }
-            R.id.action_filter -> {
-                // TODO: filtering logic
-                true
-            }
-            R.id.action_more -> {
-                Toast.makeText(requireContext(), "More options clicked", Toast.LENGTH_SHORT).show()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
+            data.clear()
+            data.addAll(items)
+            adapter.submit(items)
         }
     }
 
+    // Query MediaStore for videos
+    private fun queryVideos(): List<MediaItem> {
+        val list = mutableListOf<MediaItem>()
 
+        val collection = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+            MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
+        } else {
+            MediaStore.Video.Media.EXTERNAL_CONTENT_URI
+        }
 
+        val projection = arrayOf(
+            MediaStore.Video.Media._ID,
+            MediaStore.Video.Media.DISPLAY_NAME,
+            MediaStore.Video.Media.BUCKET_DISPLAY_NAME,
+            MediaStore.Video.Media.DURATION
+        )
+
+        val sortOrder = "${MediaStore.Video.Media.DATE_ADDED} DESC"
+
+        requireContext().contentResolver.query(
+            collection,
+            projection,
+            null,
+            null,
+            sortOrder
+        )?.use { cursor ->
+            val idCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
+            val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
+            val bucketCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
+            val durCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
+
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idCol)
+                val uri = ContentUris.withAppendedId(collection, id)
+                val name = cursor.getString(nameCol) ?: "Video"
+                val folder = cursor.getString(bucketCol) ?: "Unknown"
+                val dur = cursor.getLong(durCol)
+                list.add(MediaItem(id, uri, name, folder, dur))
+            }
+        }
+        return list
+    }
+
+    // (Optional) Menu – you can hook search/sort here later
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        inflater.inflate(R.menu.main_menu, menu)
+        super.onCreateOptionsMenu(menu, inflater)
+    }
 }

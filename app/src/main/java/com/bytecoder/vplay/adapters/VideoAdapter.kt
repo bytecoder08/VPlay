@@ -1,30 +1,104 @@
 package com.bytecoder.vplay.adapters
 
+import android.content.ContentResolver
+import android.graphics.Bitmap
+import android.media.MediaMetadataRetriever
+import android.os.Build
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
+import com.bytecoder.vplay.model.MediaItem
+import kotlinx.coroutines.*
+import java.lang.Exception
 
 class VideoAdapter(
-    private val items: List<String>,
-    private val isGrid: Boolean
-) : RecyclerView.Adapter<VideoAdapter.ViewHolder>() {
+    private var items: List<MediaItem>,
+    private var isGrid: Boolean,
+    private val contentResolver: ContentResolver,
+    private val onClick: (MediaItem) -> Unit = {}
+) : RecyclerView.Adapter<VideoAdapter.VH>() {
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val title: TextView = view.findViewById(R.id.itemTitle)
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+
+    fun submit(list: List<MediaItem>) {
+        items = list
+        notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val layout = if (isGrid) R.layout.item_grid else R.layout.item_list
-        val view = LayoutInflater.from(parent.context).inflate(layout, parent, false)
-        return ViewHolder(view)
+    fun setGrid(grid: Boolean) {
+        isGrid = grid
+        notifyDataSetChanged()
     }
 
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.title.text = items[position]
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+        val layout = if (isGrid) R.layout.item_media_grid else R.layout.item_media_list
+        val v = LayoutInflater.from(parent.context).inflate(layout, parent, false)
+        return VH(v)
     }
 
-    override fun getItemCount() = items.size
+    override fun onBindViewHolder(holder: VH, position: Int) {
+        val item = items[position]
+        holder.title.text = item.displayName
+        holder.subtitle.text = item.folderName
+
+        // placeholder
+        holder.thumb.setImageResource(android.R.drawable.ic_media_play)
+        holder.itemView.setOnClickListener { onClick(item) }
+
+        // load thumbnail async
+        val currentPos = holder.bindingAdapterPosition
+        scope.launch {
+            val bmp = withContext(Dispatchers.IO) { loadVideoThumb(item) }
+            if (holder.bindingAdapterPosition == currentPos && bmp != null) {
+                holder.thumb.setImageBitmap(bmp)
+            }
+        }
+    }
+
+    override fun getItemCount(): Int = items.size
+
+    override fun onDetachedFromRecyclerView(recyclerView: RecyclerView) {
+        super.onDetachedFromRecyclerView(recyclerView)
+        scope.cancel()
+    }
+
+    inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val thumb: ImageView = itemView.findViewById(R.id.itemThumbnail)
+        val title: TextView = itemView.findViewById(R.id.itemTitle)
+        val subtitle: TextView = itemView.findViewById(R.id.itemSubtitle)
+    }
+
+    private fun loadVideoThumb(item: MediaItem): Bitmap? {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                contentResolver.loadThumbnail(item.uri, Size(320, 320), null)
+            } else {
+                // Fallback pre-29 using MediaMetadataRetriever
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(itemViewCR(), item.uri)
+                val bmp = retriever.frameAtTime   // a frame
+                retriever.release()
+                bmp
+            }
+        } catch (_: Exception) { null }
+    }
+
+    // Access a view context content resolver indirection for pre-29 retriever setDataSource
+    private fun itemViewCR(): android.content.Context {
+        // This adapter is initialized with a ContentResolver, get its context via reflection-safe way
+        // but we already have a resolver; for retriever we need Context only for setDataSource(uri, headers)
+        // Use the resolver's context if available via cast, otherwise fail over.
+        return try {
+            val field = ContentResolver::class.java.getDeclaredField("mContext")
+            field.isAccessible = true
+            (field.get(contentResolver) as? android.content.Context) ?: throw IllegalStateException()
+        } catch (_: Exception) {
+            throw IllegalStateException("Context not available for legacy thumbnail load")
+        }
+    }
 }

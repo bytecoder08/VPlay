@@ -14,7 +14,7 @@ class MediaAdapter(
 ) : RecyclerView.Adapter<MediaAdapter.MediaViewHolder>() {
 
     class MediaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val img: ImageView = itemView.findViewById(R.id.itemImage)
+        val img: ImageView = itemView.findViewById(R.id.itemThumbnail)
         val title: TextView = itemView.findViewById(R.id.itemTitle)
     }
 

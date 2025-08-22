@@ -1,26 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
-    android:padding="8dp"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="wrap_content"
+    android:padding="8dp"
+    android:layout_margin="6dp"
+    android:background="@drawable/card_bg">
 
     <ImageView
-        android:id="@+id/itemImage"
+        android:id="@+id/itemThumbnail"
         android:layout_width="match_parent"
-        android:layout_height="120dp"
+        android:layout_height="150dp"
         android:scaleType="centerCrop"
-        android:src="@drawable/ic_launcher_background"
-        android:background="@drawable/card_bg"
-        android:contentDescription="Thumbnail" />
+        android:src="@android:drawable/ic_media_play" />
 
     <TextView
         android:id="@+id/itemTitle"
-        android:layout_marginTop="6dp"
-        android:text="Item Title"
-        android:textSize="14sp"
-        android:ellipsize="end"
-        android:maxLines="1"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="Title"
+        android:textStyle="bold"
+        android:textSize="15sp"
+        android:paddingTop="6dp" />
+
+    <TextView
+        android:id="@+id/itemSubtitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Folder"
+        android:textSize="12sp"
+        android:textColor="#777777"/>
 </LinearLayout>

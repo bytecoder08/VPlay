@@ -12,7 +12,7 @@ class HomeAdapter(private val items: List<String>) :
     RecyclerView.Adapter<HomeAdapter.HomeViewHolder>() {
 
     class HomeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val img: ImageView = itemView.findViewById(R.id.itemImage)
+        val img: ImageView = itemView.findViewById(R.id.itemThumbnail)
         val title: TextView = itemView.findViewById(R.id.itemTitle)
     }
 
