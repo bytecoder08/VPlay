@@ -25,7 +25,7 @@ class VideoPlaybackService : Service() {
 
     private fun startForegroundWith(title: String) {
         val notif: Notification = NotificationCompat.Builder(this, "vplay_video_channel")
-            .setSmallIcon(R.drawable.ic_notification)
+            .setSmallIcon(R.drawable.notifications_24px)
             .setContentTitle(title)
             .setContentText(getString(R.string.now_playing_video))
             .setOngoing(true)

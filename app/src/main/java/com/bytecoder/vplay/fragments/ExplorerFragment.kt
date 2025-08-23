@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.adapters.ExplorerAdapter
+import com.bytecoder.vplay.player.PlayerLauncher
 import java.io.File
-import kotlin.collections.toList
 
 class ExplorerFragment : Fragment() {
 
@@ -30,16 +30,21 @@ class ExplorerFragment : Fragment() {
         recyclerView = view.findViewById(R.id.recyclerExplorer)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
+        // --- CHANGED: Added PlayerLauncher inside adapter click ---
         adapter = ExplorerAdapter(emptyList()) { file ->
             if (file.isDirectory) {
                 openFolder(file)
             } else {
-                Toast.makeText(requireContext(), "File: ${file.name}", Toast.LENGTH_SHORT).show()
+                val extension = file.extension.lowercase()
+                if (extension in listOf("mp3", "aac", "wav", "mp4", "mkv", "3gp")) {
+                    PlayerLauncher.play(requireContext(), file.path, file.name)
+                } else {
+                    Toast.makeText(requireContext(), "File: ${file.name}", Toast.LENGTH_SHORT).show()
+                }
             }
         }
         recyclerView.adapter = adapter
 
-        // Start at root directory
         val rootDir = Environment.getExternalStorageDirectory()
         openFolder(rootDir)
 
@@ -48,7 +53,6 @@ class ExplorerFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -64,7 +68,7 @@ class ExplorerFragment : Fragment() {
 
     private fun openFolder(folder: File) {
         currentDir = folder
-        val files = folder.listFiles()?.sortedBy { it.name.lowercase() } ?.toList()?:emptyList()
+        val files = folder.listFiles()?.sortedBy { it.name.lowercase() }?.toList() ?: emptyList()
         adapter.updateData(files)
     }
 

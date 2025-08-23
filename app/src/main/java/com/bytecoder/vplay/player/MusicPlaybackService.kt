@@ -5,7 +5,6 @@ import android.app.Service
 import android.content.Intent
 import android.net.Uri
 import android.os.IBinder
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.bytecoder.vplay.R
 import com.google.android.exoplayer2.Player
@@ -22,9 +21,9 @@ class MusicPlaybackService : Service() {
     override fun onCreate() {
         super.onCreate()
         scope.launch {
-            PlayerManager.ensureInitialized(applicationContext)
+            MusicPlayerManager.ensureInitialized(applicationContext)
             startForegroundWithNowPlaying()
-            PlayerManager.player?.addListener(object : Player.Listener {
+            MusicPlayerManager.player?.addListener(object : Player.Listener {
                 override fun onMediaItemTransition(item: com.google.android.exoplayer2.MediaItem?, reason: Int) {
                     startForegroundWithNowPlaying()
                 }
@@ -39,11 +38,11 @@ class MusicPlaybackService : Service() {
 
         if (uriStrs.isNotEmpty()) {
             val uris = uriStrs.map { Uri.parse(it) }
-            PlayerManager.setPlaylist(uris, titles, index)
+            MusicPlayerManager.setPlaylist(uris, titles, index)
         }
 
         // Handle media button intents
-        MediaButtonReceiver.handleIntent(PlayerManager.mediaSession, intent)
+        MediaButtonReceiver.handleIntent(MusicPlayerManager.mediaSession, intent)
 
         return START_STICKY
     }
@@ -55,17 +54,17 @@ class MusicPlaybackService : Service() {
     override fun onBind(intent: Intent?): IBinder? = null
 
     private fun startForegroundWithNowPlaying() {
-        val p = PlayerManager.player
-        val title = PlayerManager.titles.getOrNull(p?.currentMediaItemIndex ?: 0) ?: getString(R.string.app_name)
-        val notification: Notification = NotificationCompat.Builder(this, PlayerManager.NOTIF_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification)
+        val p = MusicPlayerManager.player
+        val title = MusicPlayerManager.titles.getOrNull(p?.currentMediaItemIndex ?: 0) ?: getString(R.string.app_name)
+        val notification: Notification = NotificationCompat.Builder(this, MusicPlayerManager.NOTIF_CHANNEL_ID)
+            .setSmallIcon(R.drawable.notifications_24px)
             .setContentTitle(title)
             .setContentText(getString(R.string.now_playing))
             .setOngoing(true)
             .build()
 
         // simple call, cross API levels
-        startForeground(PlayerManager.NOTIF_ID, notification)
+        startForeground(MusicPlayerManager.NOTIF_ID, notification)
     }
 
     companion object {

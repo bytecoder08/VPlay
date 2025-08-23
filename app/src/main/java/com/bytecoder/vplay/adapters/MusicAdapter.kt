@@ -3,6 +3,8 @@ package com.bytecoder.vplay.adapters
 import android.content.ContentResolver
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
+import android.os.Build
+import android.util.Size
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,8 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.model.MediaItem
 import kotlinx.coroutines.*
-import java.lang.Exception
 
+// --- CHANGED/ADDED: Added onClick integration with PlayerLauncher ---
 class MusicAdapter(
     private var items: List<MediaItem>,
     private var isGrid: Boolean,
@@ -43,12 +45,22 @@ class MusicAdapter(
         val item = items[position]
         holder.title.text = item.displayName
         holder.subtitle.text = item.folderName
-        holder.itemView.setOnClickListener { onClick(item) }
 
-        // placeholder icon
+        // --- ADDED: Set click listener with PlayerLauncher ---
+        holder.itemView.setOnClickListener {
+            // Existing onClick preserved
+            onClick(item)
+
+            // --- ADDED snippet ---
+            com.bytecoder.vplay.player.PlayerLauncher.play(
+                context = it.context,
+                fileOrUrl = item.uri.path ?: "",
+                title = item.displayName
+            )
+        }
+
         holder.thumb.setImageResource(android.R.drawable.ic_media_play)
 
-        // load embedded art (if present)
         val currentPos = holder.bindingAdapterPosition
         scope.launch {
             val bmp = withContext(Dispatchers.IO) { loadAlbumArt(item) }
@@ -73,12 +85,16 @@ class MusicAdapter(
 
     private fun loadAlbumArt(item: MediaItem): Bitmap? {
         return try {
-            val mmr = MediaMetadataRetriever()
-            mmr.setDataSource(contentResolver.openFileDescriptor(item.uri, "r")?.fileDescriptor)
-            val art = mmr.embeddedPicture
-            val bmp = if (art != null) android.graphics.BitmapFactory.decodeByteArray(art, 0, art.size) else null
-            mmr.release()
-            bmp
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                contentResolver.loadThumbnail(item.uri, Size(320, 320), null)
+            } else {
+                val retriever = MediaMetadataRetriever()
+                retriever.setDataSource(contentResolver.openFileDescriptor(item.uri, "r")?.fileDescriptor)
+                val art = retriever.embeddedPicture
+                val bmp = if (art != null) android.graphics.BitmapFactory.decodeByteArray(art, 0, art.size) else null
+                retriever.release()
+                bmp
+            }
         } catch (_: Exception) { null }
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -40,7 +41,7 @@
             android:background="@android:color/transparent"
             android:padding="8dp"
             android:contentDescription="Lock"
-            android:src="@drawable/ic_unlock" />
+            android:src="@drawable/lock_open_24px" />
 
         <TextView
             android:id="@+id/tvTitle"
@@ -60,7 +61,7 @@
             android:background="@android:color/transparent"
             android:padding="8dp"
             android:contentDescription="Rotate mode"
-            android:src="@drawable/ic_rotate" />
+            android:src="@drawable/mobile_rotate_24px" />
 
         <ImageButton
             android:id="@+id/btnFullscreen"
@@ -69,7 +70,7 @@
             android:background="@android:color/transparent"
             android:padding="8dp"
             android:contentDescription="Fullscreen"
-            android:src="@drawable/ic_fullscreen" />
+            android:src="@drawable/fullscreen_24px" />
     </LinearLayout>
 
     <!-- Center overlay (seek/speed/volume/brightness hints) -->
@@ -87,7 +88,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:visibility="gone"
-            android:src="@drawable/ic_play" />
+            android:src="@drawable/play_arrow_24px" />
 
         <TextView
             android:id="@+id/overlayHint"

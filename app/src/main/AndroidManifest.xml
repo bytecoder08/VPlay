@@ -65,7 +65,7 @@
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".player.QueueActivity"
+            android:name=".player.MusicQueueActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 

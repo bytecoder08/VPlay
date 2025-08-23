@@ -61,11 +61,5 @@ dependencies {
     implementation("com.google.android.exoplayer:extension-mediasession:2.19.1")
     implementation("androidx.media:media:1.6.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-
-    //video player
-    implementation("com.google.android.exoplayer2:exoplayer:2.19.1")
-    implementation("com.google.android.exoplayer2:extension-mediasession:2.19.1")
-    implementation("androidx.core:core-ktx:1.13.1")
-    implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
 }

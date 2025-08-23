@@ -1,6 +1,7 @@
 package com.bytecoder.vplay.fragments
 
 import android.content.ContentUris
+import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
@@ -16,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.adapters.VideoAdapter
 import com.bytecoder.vplay.model.MediaItem
+import com.bytecoder.vplay.player.PlayerLauncher
+import com.bytecoder.vplay.player.VideoPlayerManager
+import com.bytecoder.vplay.player.VideoQueueActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,8 +45,16 @@ class VideoFragment : Fragment() {
             isGrid = isGrid,
             contentResolver = requireContext().contentResolver
         ) { item ->
-            Toast.makeText(requireContext(), "Play: ${item.displayName}", Toast.LENGTH_SHORT).show()
-            // TODO: start your VideoPlayer with item.uri
+            PlayerLauncher.play(
+                requireContext(),
+                fileOrUrl = item.uri.toString(),
+                title = item.displayName
+            )
+
+            // Dynamic queue update
+            VideoPlayerManager.setQueue(data)
+            val index = data.indexOf(item)
+            if (index >= 0) VideoPlayerManager.jumpTo(index)
         }
 
         setupRecycler()
@@ -135,6 +147,17 @@ class VideoFragment : Fragment() {
     // (Optional) Menu – you can hook search/sort here later
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main_menu, menu)
+
+        // --- Added: Queue button to open VideoQueueActivity ---
+        val queueItem = menu.findItem(R.id.action_queue)
+        queueItem?.setOnMenuItemClickListener {
+            val currentIndex = VideoPlayerManager.getCurrentIndex()
+            val intent = Intent(requireContext(), VideoQueueActivity::class.java)
+            intent.putExtra("currentIndex", currentIndex)
+            startActivity(intent)
+            true
+        }
+
         super.onCreateOptionsMenu(menu, inflater)
     }
 }

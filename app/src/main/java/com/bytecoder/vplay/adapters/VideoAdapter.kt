@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.model.MediaItem
+import com.bytecoder.vplay.player.VideoPlayerManager
 import kotlinx.coroutines.*
 import java.lang.Exception
 
@@ -46,11 +47,23 @@ class VideoAdapter(
         holder.title.text = item.displayName
         holder.subtitle.text = item.folderName
 
-        // placeholder
         holder.thumb.setImageResource(android.R.drawable.ic_media_play)
-        holder.itemView.setOnClickListener { onClick(item) }
 
-        // load thumbnail async
+        // --- ADDED: click listener with PlayerLauncher ---
+        holder.itemView.setOnClickListener {
+            VideoPlayerManager.setQueue(items)
+            val index = items.indexOf(item)
+            if (index >= 0) VideoPlayerManager.jumpTo(index)
+
+            com.bytecoder.vplay.player.PlayerLauncher.play(
+                context = it.context,
+                fileOrUrl = item.uri.path ?: "",
+                title = item.displayName
+            )
+
+            onClick(item)
+        }
+
         val currentPos = holder.bindingAdapterPosition
         scope.launch {
             val bmp = withContext(Dispatchers.IO) { loadVideoThumb(item) }
@@ -78,21 +91,16 @@ class VideoAdapter(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 contentResolver.loadThumbnail(item.uri, Size(320, 320), null)
             } else {
-                // Fallback pre-29 using MediaMetadataRetriever
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(itemViewCR(), item.uri)
-                val bmp = retriever.frameAtTime   // a frame
+                val bmp = retriever.frameAtTime
                 retriever.release()
                 bmp
             }
         } catch (_: Exception) { null }
     }
 
-    // Access a view context content resolver indirection for pre-29 retriever setDataSource
     private fun itemViewCR(): android.content.Context {
-        // This adapter is initialized with a ContentResolver, get its context via reflection-safe way
-        // but we already have a resolver; for retriever we need Context only for setDataSource(uri, headers)
-        // Use the resolver's context if available via cast, otherwise fail over.
         return try {
             val field = ContentResolver::class.java.getDeclaredField("mContext")
             field.isAccessible = true

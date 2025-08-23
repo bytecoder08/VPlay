@@ -24,6 +24,13 @@
         android:icon="@android:drawable/ic_menu_manage"
         app:showAsAction="ifRoom" />
 
+    <!-- Queue -->
+    <item
+        android:id="@+id/action_queue"
+        android:title="Queue"
+        android:icon="@drawable/queue_play_next_24px"
+        app:showAsAction="always" />
+
     <!-- Overflow menu -->
     <item
         android:id="@+id/action_more"

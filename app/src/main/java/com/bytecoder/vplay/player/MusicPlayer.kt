@@ -3,10 +3,13 @@ package com.bytecoder.vplay.player
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bytecoder.vplay.databinding.MusicPlayerBinding
+import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.PlaybackException
 import kotlinx.coroutines.launch
 import com.bytecoder.vplay.R
 
@@ -36,22 +39,34 @@ class MusicPlayer : AppCompatActivity() {
 
         // Ensure PlayerManager initialized and attach player
         lifecycleScope.launch {
-            PlayerManager.ensureInitialized(applicationContext)
-            binding.playerView.player = PlayerManager.player
+            MusicPlayerManager.ensureInitialized(applicationContext)
+            binding.playerView.player = MusicPlayerManager.player
             wireControls()
             refreshUiFromPlayer()
         }
+
+        // --- ADDED: Player error handling with queue integration ---
+        MusicPlayerManager.player?.addListener(object : Player.Listener {
+            override fun onPlayerError(error: PlaybackException) {
+                if (MusicPlayerManager.isInQueueMode()) {
+                    MusicPlayerManager.handleQueueError(MusicPlayerManager.player!!, error)
+                } else {
+                    Toast.makeText(this@MusicPlayer, "Cannot play this audio", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }
+        })
     }
 
     override fun onStart() {
         super.onStart()
-        PlayerManager.player?.addListener(playerListener)
-        binding.playerView.player = PlayerManager.player
+        MusicPlayerManager.player?.addListener(playerListener)
+        binding.playerView.player = MusicPlayerManager.player
         refreshUiFromPlayer()
     }
 
     override fun onStop() {
-        PlayerManager.player?.removeListener(playerListener)
+        MusicPlayerManager.player?.removeListener(playerListener)
         super.onStop()
     }
 
@@ -66,45 +81,43 @@ class MusicPlayer : AppCompatActivity() {
 
     private fun wireControls() {
         binding.btnPlayPause.setOnClickListener {
-            PlayerManager.player?.let { p -> p.playWhenReady = !p.isPlaying }
+            MusicPlayerManager.player?.let { p -> p.playWhenReady = !p.isPlaying }
             updatePlayPause()
         }
-        binding.btnNext.setOnClickListener { PlayerManager.player?.seekToNextMediaItem() }
-        binding.btnPrev.setOnClickListener { PlayerManager.player?.seekToPreviousMediaItem() }
+        binding.btnNext.setOnClickListener { MusicPlayerManager.player?.seekToNextMediaItem() }
+        binding.btnPrev.setOnClickListener { MusicPlayerManager.player?.seekToPreviousMediaItem() }
         binding.btnShuffle.setOnClickListener {
-            PlayerManager.player?.let { p ->
+            MusicPlayerManager.player?.let { p ->
                 p.shuffleModeEnabled = !(p.shuffleModeEnabled)
                 binding.btnShuffle.alpha = if (p.shuffleModeEnabled) 1f else 0.5f
             }
         }
         binding.btnRepeat.setOnClickListener {
-            PlayerManager.player?.let { p ->
+            MusicPlayerManager.player?.let { p ->
                 p.repeatMode = when (p.repeatMode) {
                     Player.REPEAT_MODE_OFF -> Player.REPEAT_MODE_ALL
                     Player.REPEAT_MODE_ALL -> Player.REPEAT_MODE_ONE
                     else -> Player.REPEAT_MODE_OFF
                 }
-                // update icon alpha
                 binding.btnRepeat.alpha = if (p.repeatMode == Player.REPEAT_MODE_OFF) 0.5f else 1f
             }
         }
         binding.btnQueue.setOnClickListener {
-            startActivity(Intent(this, QueueActivity::class.java))
+            startActivity(Intent(this, MusicQueueActivity::class.java))
         }
     }
 
     private fun refreshUiFromPlayer() {
-        val p = PlayerManager.player ?: return
+        val p = MusicPlayerManager.player ?: return
         val idx = p.currentMediaItemIndex.coerceAtLeast(0)
-        binding.tvTitle.text = PlayerManager.titles.getOrNull(idx) ?: PlayerManager.uris.getOrNull(idx)?.lastPathSegment ?: getString(R.string.app_name)
-        binding.tvSubtitle.text = PlayerManager.uris.getOrNull(idx)?.path ?: ""
-        // album art update is handled by PlayerManager notification; we set placeholder
+        binding.tvTitle.text = MusicPlayerManager.titles.getOrNull(idx) ?: MusicPlayerManager.uris.getOrNull(idx)?.lastPathSegment ?: getString(R.string.app_name)
+        binding.tvSubtitle.text = MusicPlayerManager.uris.getOrNull(idx)?.path ?: ""
         binding.albumArt.setImageResource(R.drawable.ic_album_placeholder)
         updatePlayPause()
     }
 
     private fun updatePlayPause() {
-        val playing = PlayerManager.player?.isPlaying == true
+        val playing = MusicPlayerManager.player?.isPlaying == true
         binding.btnPlayPause.setImageResource(if (playing) android.R.drawable.ic_media_pause else android.R.drawable.ic_media_play)
     }
 

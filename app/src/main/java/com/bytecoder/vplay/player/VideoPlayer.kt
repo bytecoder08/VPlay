@@ -10,7 +10,6 @@ import android.os.Looper
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.view.ViewGroup
 import android.view.WindowManager
 import android.widget.ImageButton
 import android.widget.ImageView
@@ -19,9 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bytecoder.vplay.R
-import com.google.android.exoplayer2.C
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.MediaMetadata
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.MimeTypes
 import kotlin.math.abs
@@ -65,7 +62,6 @@ class VideoPlayer : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.video_player)
 
-        // Keep screen on while playing video
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         audioManager = getSystemService(Context.AUDIO_SERVICE) as AudioManager
@@ -75,6 +71,18 @@ class VideoPlayer : AppCompatActivity() {
         setupButtons()
         setupPlayerAndPlay()
         setupGestures()
+
+        // --- ADDED: Player error handling with queue integration ---
+        VideoPlayerManager.player?.addListener(object : Player.Listener {
+            override fun onPlayerError(error: PlaybackException) {
+                if (VideoPlayerManager.isInQueueMode()) {
+                    VideoPlayerManager.handleQueueError(VideoPlayerManager.player!!, error)
+                } else {
+                    Toast.makeText(this@VideoPlayer, "Cannot play this file", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+            }
+        })
     }
 
     private fun bindViews() {
@@ -93,12 +101,10 @@ class VideoPlayer : AppCompatActivity() {
         volumeBar = findViewById(R.id.volumeBar)
         bottomBar = findViewById(R.id.bottomBar)
 
-        // Setup bars
         brightnessBar.max = 100
         volumeBar.max = maxVolume
         volumeBar.progress = audioManager.getStreamVolume(AudioManager.STREAM_MUSIC)
 
-        // Initial title
         tvTitle.text = intent.getStringExtra("title") ?: getString(R.string.app_name)
     }
 
@@ -120,7 +126,6 @@ class VideoPlayer : AppCompatActivity() {
         playerView.controllerShowTimeoutMs = 3000
         playerView.controllerHideOnTouch = true
 
-        // Load MediaItem
         val url = intent.getStringExtra("url") ?: run {
             Toast.makeText(this, "No video URL", Toast.LENGTH_SHORT).show()
             finish()
@@ -129,14 +134,10 @@ class VideoPlayer : AppCompatActivity() {
 
         val title = intent.getStringExtra("title") ?: Uri.parse(url).lastPathSegment ?: "Video"
 
-        val subtitleUrl = intent.getStringExtra("subtitle_url") // optional
+        val subtitleUrl = intent.getStringExtra("subtitle_url")
         val mediaItemBuilder = MediaItem.Builder()
             .setUri(url)
-            .setMediaMetadata(
-                MediaMetadata.Builder()
-                    .setTitle(title)
-                    .build()
-            )
+            .setMediaMetadata(MediaMetadata.Builder().setTitle(title).build())
 
         if (!subtitleUrl.isNullOrBlank()) {
             val subs = MediaItem.SubtitleConfiguration.Builder(Uri.parse(subtitleUrl))
@@ -150,7 +151,6 @@ class VideoPlayer : AppCompatActivity() {
         val mediaItem = mediaItemBuilder.build()
         VideoPlayerManager.setMediaItem(mediaItem, playWhenReady = true)
 
-        // Start the service for ongoing playback notification
         VideoPlaybackService.startForeground(this, title)
 
         uiHandler.post(timeUpdate)
@@ -164,21 +164,19 @@ class VideoPlayer : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         uiHandler.removeCallbacks(timeUpdate)
-        // We DO NOT release the player here so playback can continue in background
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // Do not release here if you want background; VideoPlaybackService owns lifecycle
     }
 
     private fun toggleFullscreen() {
         isFullscreen = !isFullscreen
         if (isFullscreen) {
-            btnFullscreen.setImageResource(R.drawable.ic_fullscreen_exit)
+            btnFullscreen.setImageResource(R.drawable.fullscreen_exit_24px)
             enterFullscreen()
         } else {
-            btnFullscreen.setImageResource(R.drawable.ic_fullscreen)
+            btnFullscreen.setImageResource(R.drawable.fullscreen_24px)
             exitFullscreen()
         }
     }
@@ -198,17 +196,17 @@ class VideoPlayer : AppCompatActivity() {
         rotateMode = when (rotateMode) {
             RotateMode.SENSOR -> {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                btnRotateMode.setImageResource(R.drawable.ic_rotate) // same icon; could vary if you want
+                btnRotateMode.setImageResource(R.drawable.mobile_rotate_24px)
                 RotateMode.PORTRAIT
             }
             RotateMode.PORTRAIT -> {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                btnRotateMode.setImageResource(R.drawable.ic_rotate)
+                btnRotateMode.setImageResource(R.drawable.mobile_rotate_24px)
                 RotateMode.LANDSCAPE
             }
             RotateMode.LANDSCAPE -> {
                 requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR
-                btnRotateMode.setImageResource(R.drawable.ic_rotate)
+                btnRotateMode.setImageResource(R.drawable.mobile_rotate_24px)
                 RotateMode.SENSOR
             }
         }
@@ -218,11 +216,11 @@ class VideoPlayer : AppCompatActivity() {
     private fun toggleLock() {
         locked = !locked
         if (locked) {
-            btnLock.setImageResource(R.drawable.ic_lock)
+            btnLock.setImageResource(R.drawable.lock_24px)
             playerView.useController = false
             toastShort("Controls locked")
         } else {
-            btnLock.setImageResource(R.drawable.ic_unlock)
+            btnLock.setImageResource(R.drawable.lock_open_24px)
             playerView.useController = true
             toastShort("Controls unlocked")
         }
@@ -289,8 +287,6 @@ class VideoPlayer : AppCompatActivity() {
 
         touchView.setOnTouchListener { _, event ->
             if (locked) return@setOnTouchListener true
-
-            // Pass to detector first
             gestureDetector.onTouchEvent(event)
 
             when (event.actionMasked) {
@@ -306,26 +302,15 @@ class VideoPlayer : AppCompatActivity() {
 
                     if (!adjustingBrightness && !adjustingVolume) {
                         if (abs(dy) > abs(dx)) {
-                            // vertical swipe
-                            if (startX < touchView.width / 2f) {
-                                adjustingBrightness = true
-                            } else {
-                                adjustingVolume = true
-                            }
+                            if (startX < touchView.width / 2f) adjustingBrightness = true
+                            else adjustingVolume = true
                         }
                     }
-                    if (adjustingBrightness) {
-                        val delta = -dy / touchView.height // up increases
-                        adjustBrightness(delta)
-                    } else if (adjustingVolume) {
-                        val delta = -dy / touchView.height // up increases
-                        adjustVolume(delta)
-                    }
+                    if (adjustingBrightness) adjustBrightness(-dy / touchView.height)
+                    else if (adjustingVolume) adjustVolume(-dy / touchView.height)
                 }
                 MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
-                    if (longPressBoosting) {
-                        resetPlaybackSpeed()
-                    }
+                    if (longPressBoosting) resetPlaybackSpeed()
                     hideOverlaySoon()
                 }
             }
@@ -335,7 +320,7 @@ class VideoPlayer : AppCompatActivity() {
 
     private fun adjustBrightness(delta: Float) {
         val lp = window.attributes
-        var b = if (lp.screenBrightness < 0f) 0.5f else lp.screenBrightness // default mid if unknown
+        var b = if (lp.screenBrightness < 0f) 0.5f else lp.screenBrightness
         b += delta
         b = min(1f, max(0f, b))
         lp.screenBrightness = b
@@ -343,7 +328,7 @@ class VideoPlayer : AppCompatActivity() {
 
         brightnessBar.visibility = View.VISIBLE
         brightnessBar.progress = (b * 100).toInt()
-        overlayIcon.setImageResource(R.drawable.ic_unlock) // simple white icon; use sun icon if you have one
+        overlayIcon.setImageResource(R.drawable.lock_open_24px)
         overlayHint.text = "Brightness: ${(b * 100).toInt()}%"
         showOverlay()
     }
@@ -356,7 +341,7 @@ class VideoPlayer : AppCompatActivity() {
 
         volumeBar.visibility = View.VISIBLE
         volumeBar.progress = newVol
-        overlayIcon.setImageResource(R.drawable.ic_lock) // simple white icon; use volume icon if you have one
+        overlayIcon.setImageResource(R.drawable.lock_24px)
         overlayHint.text = "Volume: ${((newVol.toFloat() / maxVolume) * 100).toInt()}%"
         showOverlay()
     }

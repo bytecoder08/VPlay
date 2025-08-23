@@ -1,6 +1,7 @@
 package com.bytecoder.vplay.fragments
 
 import android.content.ContentUris
+import android.content.Intent
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
@@ -16,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.adapters.MusicAdapter
 import com.bytecoder.vplay.model.MediaItem
+import com.bytecoder.vplay.player.MusicPlayerManager
+import com.bytecoder.vplay.player.MusicQueueActivity
+import com.bytecoder.vplay.player.PlayerLauncher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -41,8 +45,23 @@ class MusicFragment : Fragment() {
             isGrid = isGrid,
             contentResolver = requireContext().contentResolver
         ) { item ->
-            Toast.makeText(requireContext(), "Play: ${item.displayName}", Toast.LENGTH_SHORT).show()
-            // TODO: start your MusicPlayer with item.uri
+
+            // --- CHANGED: PlayerLauncher call ---
+            PlayerLauncher.play(
+                requireContext(),
+                fileOrUrl = item.uri.toString(),
+                title = item.displayName
+            )
+
+            // Dynamic queue update for MusicPlayerManager
+            MusicPlayerManager.setPlaylist(
+                newUris = data.map { it.uri },
+                newTitles = data.map { it.displayName }
+            )
+            val index = data.indexOf(item)
+            if (index >= 0) {
+                MusicPlayerManager.jumpTo(index)
+            }
         }
 
         setupRecycler()
@@ -80,19 +99,15 @@ class MusicFragment : Fragment() {
 
     private fun loadAudio() {
         lifecycleScope.launch {
-            val items = withContext(Dispatchers.IO) {
-                queryAudio()
-            }
+            val items = withContext(Dispatchers.IO) { queryAudio() }
             data.clear()
             data.addAll(items)
             adapter.submit(items)
         }
     }
 
-    // Query MediaStore for audio
     private fun queryAudio(): List<MediaItem> {
         val list = mutableListOf<MediaItem>()
-
         val collection = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
             MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL)
         } else {
@@ -102,7 +117,7 @@ class MusicFragment : Fragment() {
         val projection = arrayOf(
             MediaStore.Audio.Media._ID,
             MediaStore.Audio.Media.DISPLAY_NAME,
-            MediaStore.Audio.Media.BUCKET_DISPLAY_NAME, // may be null on some devices
+            MediaStore.Audio.Media.BUCKET_DISPLAY_NAME,
             MediaStore.Audio.Media.DURATION
         )
 
@@ -135,6 +150,17 @@ class MusicFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main_menu, menu)
+
+        // Queue button click listener
+        val queueItem = menu.findItem(R.id.action_queue)
+        queueItem?.setOnMenuItemClickListener {
+            val currentIndex = MusicPlayerManager.player?.currentMediaItemIndex ?: 0
+            val intent = Intent(requireContext(), MusicQueueActivity::class.java)
+            intent.putExtra("currentIndex", currentIndex)
+            startActivity(intent)
+            true
+        }
+
         super.onCreateOptionsMenu(menu, inflater)
     }
 }

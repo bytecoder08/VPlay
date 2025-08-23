@@ -65,7 +65,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_queue"
+            android:src="@drawable/queue_music_24px"
             android:contentDescription="Queue" />
 
         <ImageButton
@@ -73,7 +73,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_shuffle_24"
+            android:src="@drawable/shuffle_24px"
             android:contentDescription="Shuffle"
             android:alpha="0.5" />
 
@@ -106,7 +106,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:background="?attr/selectableItemBackgroundBorderless"
-            android:src="@drawable/ic_repeat_off_24"
+            android:src="@drawable/repeat_24px"
             android:contentDescription="Repeat"
             android:alpha="0.5" />
     </LinearLayout>

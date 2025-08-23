@@ -2,5 +2,10 @@
     <string name="app_name">vPlay</string>
     <string name="now_playing">Now Playing</string>
     <string name="now_playing_video">Now playing video</string>
+    <string name="video_player_title">Video Player</string>
+    <string name="queue_title">Queue</string>
+    <string name="speed">Speed</string>
+    <string name="forward">Forward</string>
+    <string name="rewind">Rewind</string>
 
 </resources>

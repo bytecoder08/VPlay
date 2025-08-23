@@ -11,17 +11,13 @@ import android.os.Build
 import android.util.Log
 import androidx.core.content.getSystemService
 import com.bytecoder.vplay.R
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
-import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import android.support.v4.media.session.MediaSessionCompat
 
-object PlayerManager {
+object MusicPlayerManager {
 
     const val NOTIF_CHANNEL_ID = "vplay_playback_channel"
     const val NOTIF_CHANNEL_NAME = "Playback"
@@ -38,13 +34,27 @@ object PlayerManager {
 
     private var mediaSessionConnector: MediaSessionConnector? = null
 
-    // playlist in memory
     val uris: MutableList<Uri> = mutableListOf()
     val titles: MutableList<String> = mutableListOf()
 
-    /**
-     * Initialize ExoPlayer, MediaSession and PlayerNotificationManager.
-     */
+    // ----------------- ADDED QUEUE SUPPORT -----------------
+    private var queueMode = false
+    fun enableQueueMode(enable: Boolean) { queueMode = enable }
+    fun isInQueueMode() = queueMode
+
+    fun handleQueueError(player: ExoPlayer, error: PlaybackException) {
+        val nextIndex = player.currentMediaItemIndex + 1
+        if (nextIndex < player.mediaItemCount) {
+            player.seekTo(nextIndex, 0)
+            player.play()
+        } else {
+            player.stop()
+            // optionally show a toast
+            Log.w("MusicPlayerManager", "Queue finished or item cannot play")
+        }
+    }
+    // -------------------------------------------------------
+
     suspend fun ensureInitialized(appContext: Context) {
         if (player != null) return
 
@@ -52,8 +62,8 @@ object PlayerManager {
 
         val exo = ExoPlayer.Builder(appContext).build()
         val audioAttr = AudioAttributes.Builder()
-            .setUsage(com.google.android.exoplayer2.C.USAGE_MEDIA)
-            .setContentType(com.google.android.exoplayer2.C.AUDIO_CONTENT_TYPE_MUSIC)
+            .setUsage(C.USAGE_MEDIA)
+            .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
             .build()
         exo.setAudioAttributes(audioAttr, true)
         exo.playWhenReady = true
@@ -82,7 +92,6 @@ object PlayerManager {
 
                 override fun getCurrentLargeIcon(player: Player, callback: PlayerNotificationManager.BitmapCallback): Bitmap? {
                     val uri = uris.getOrNull(player.currentMediaItemIndex) ?: return null
-                    // Try synchronous small art; if not available load async and call callback
                     val bmp = tryExtractEmbedded(appContext, uri)
                     if (bmp != null) return bmp
                     Thread {
@@ -94,7 +103,7 @@ object PlayerManager {
             })
             .setChannelImportance(NotificationManager.IMPORTANCE_LOW)
             .build().apply {
-                setSmallIcon(R.drawable.ic_notification)
+                setSmallIcon(R.drawable.notifications_24px)
                 mediaSession?.sessionToken?.let { token ->
                     setMediaSessionToken(token)
                 }
@@ -113,6 +122,16 @@ object PlayerManager {
             notificationManager?.setMediaSessionToken(token)
         }
 
+        // ----------------- ADDED: Player error listener -----------------
+        exo.addListener(object : Player.Listener {
+            override fun onPlayerError(error: PlaybackException) {
+                if (queueMode) handleQueueError(exo, error)
+                else {
+                    Log.w("MusicPlayerManager", "Playback error: ${error.message}")
+                }
+            }
+        })
+        // -----------------------------------------------------------------
     }
 
     fun setPlaylist(newUris: List<Uri>, newTitles: List<String>, startIndex: Int = 0) {

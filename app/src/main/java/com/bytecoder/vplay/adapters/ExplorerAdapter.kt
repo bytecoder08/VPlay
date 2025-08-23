@@ -1,12 +1,16 @@
 package com.bytecoder.vplay.adapters
 
+import android.content.Context
+import android.webkit.MimeTypeMap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
+import com.bytecoder.vplay.player.PlayerLauncher
 import java.io.File
 
 class ExplorerAdapter(
@@ -31,7 +35,29 @@ class ExplorerAdapter(
         holder.icon.setImageResource(
             if (file.isDirectory) R.drawable.folder_24px else R.drawable.file_24px
         )
-        holder.itemView.setOnClickListener { onClick(file) }
+
+        // --- CHANGED: Added PlayerLauncher for audio/video files ---
+        holder.itemView.setOnClickListener {
+            if (file.isDirectory) {
+                onClick(file)
+            } else {
+                val extension = file.extension.lowercase()
+                val mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension) ?: ""
+
+                if (mimeType.startsWith("audio") || mimeType.startsWith("video") ||
+                    extension in listOf("mp3", "aac", "wav", "mp4", "mkv", "3gp")) {
+                    // Play audio/video files
+                    PlayerLauncher.play(
+                        context = it.context,
+                        fileOrUrl = file.path,
+                        title = file.name
+                    )
+                } else {
+                    // Other files → keep previous behavior
+                    Toast.makeText(it.context, "File: ${file.name}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 
     override fun getItemCount(): Int = items.size

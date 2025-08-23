@@ -6,8 +6,7 @@ import android.content.Context
 import android.os.Build
 import androidx.core.content.getSystemService
 import com.bytecoder.vplay.R
-import com.google.android.exoplayer2.ExoPlayer
-import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
@@ -25,6 +24,15 @@ object VideoPlayerManager {
     private var connector: MediaSessionConnector? = null
     private var notification: PlayerNotificationManager? = null
 
+    // ----------------- ADDED QUEUE SUPPORT -----------------
+    private val queue = mutableListOf<MediaItem>()
+    private var currentIndex = 0
+    private var queueListener: ((List<MediaItem>) -> Unit)? = null
+    private var queueMode = false
+    fun enableQueueMode(enable: Boolean) { queueMode = enable }
+    fun isInQueueMode() = queueMode
+    // -------------------------------------------------------
+
     fun ensureInitialized(ctx: Context) {
         if (player != null) return
 
@@ -32,8 +40,8 @@ object VideoPlayerManager {
 
         val p = ExoPlayer.Builder(ctx).build().apply {
             val audioAttr = AudioAttributes.Builder()
-                .setUsage(com.google.android.exoplayer2.C.USAGE_MEDIA)
-                .setContentType(com.google.android.exoplayer2.C.AUDIO_CONTENT_TYPE_MOVIE)
+                .setUsage(C.USAGE_MEDIA)
+                .setContentType(C.AUDIO_CONTENT_TYPE_MOVIE)
                 .build()
             setAudioAttributes(audioAttr, true)
             playWhenReady = true
@@ -45,20 +53,17 @@ object VideoPlayerManager {
 
         notification = PlayerNotificationManager.Builder(ctx, NOTIF_ID, NOTIF_CHANNEL_ID)
             .setMediaDescriptionAdapter(object : PlayerNotificationManager.MediaDescriptionAdapter {
-                override fun getCurrentContentTitle(player: com.google.android.exoplayer2.Player): CharSequence {
+                override fun getCurrentContentTitle(player: Player): CharSequence {
                     val title = player.mediaMetadata.title
                     return title ?: ctx.getString(R.string.app_name)
                 }
-                override fun createCurrentContentIntent(player: com.google.android.exoplayer2.Player) = null
-                override fun getCurrentContentText(player: com.google.android.exoplayer2.Player): CharSequence? = null
-                override fun getCurrentLargeIcon(
-                    player: com.google.android.exoplayer2.Player,
-                    callback: PlayerNotificationManager.BitmapCallback
-                ) = null
+                override fun createCurrentContentIntent(player: Player) = null
+                override fun getCurrentContentText(player: Player): CharSequence? = null
+                override fun getCurrentLargeIcon(player: Player, callback: PlayerNotificationManager.BitmapCallback) = null
             })
             .setChannelImportance(NotificationManager.IMPORTANCE_LOW)
             .build().apply {
-                setSmallIcon(R.drawable.ic_notification)
+                setSmallIcon(R.drawable.notifications_24px)
                 mediaSession?.sessionToken?.let { setMediaSessionToken(it) }
                 setUsePlayPauseActions(true)
                 setUseNextAction(false)
@@ -66,6 +71,30 @@ object VideoPlayerManager {
             }
 
         notification?.setPlayer(p)
+
+        // ----------------- ADDED: Player error listener for queue -----------------
+        p.addListener(object : Player.Listener {
+            override fun onPlayerError(error: PlaybackException) {
+                if (queueMode) handleQueueError()
+                else {
+                    android.util.Log.w("VideoPlayerManager", "Playback error: ${error.message}")
+                }
+            }
+
+            override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
+                currentIndex = player?.currentMediaItemIndex ?: 0
+            }
+        })
+        // ------------------------------------------------------------------------
+    }
+
+    private fun handleQueueError() {
+        val nextIndex = currentIndex + 1
+        if (nextIndex < queue.size) {
+            jumpTo(nextIndex)
+        } else {
+            player?.stop()
+        }
     }
 
     fun setMediaItem(item: MediaItem, playWhenReady: Boolean) {
@@ -87,6 +116,8 @@ object VideoPlayerManager {
         player = null
         try { mediaSession?.release() } catch (_: Exception) {}
         mediaSession = null
+        queue.clear()
+        currentIndex = 0
     }
 
     private fun createChannel(ctx: Context) {
@@ -96,4 +127,28 @@ object VideoPlayerManager {
             nm.createNotificationChannel(ch)
         }
     }
+
+    // ----------------- QUEUE MANAGEMENT -----------------
+    fun setQueue(list: List<MediaItem>) {
+        queue.clear()
+        queue.addAll(list)
+        currentIndex = 0
+        queueListener?.invoke(queue)
+    }
+
+    fun getQueue(): List<MediaItem> = queue.toList()
+
+    fun jumpTo(index: Int) {
+        if (index in queue.indices) {
+            currentIndex = index
+            setMediaItem(queue[index], true)
+        }
+    }
+
+    fun getCurrentIndex(): Int = currentIndex
+
+    fun setQueueListener(listener: ((List<MediaItem>) -> Unit)?) {
+        queueListener = listener
+    }
+    // ----------------------------------------------------
 }
