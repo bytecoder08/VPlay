@@ -49,17 +49,21 @@ class VideoAdapter(
 
         holder.thumb.setImageResource(android.R.drawable.ic_media_play)
 
-        // --- ADDED: click listener with PlayerLauncher ---
         holder.itemView.setOnClickListener {
-            VideoPlayerManager.setQueue(items)
+            val exoItems = items.map {
+                com.google.android.exoplayer2.MediaItem.Builder()
+                    .setUri(it.uri)
+                    .setMediaMetadata(
+                        com.google.android.exoplayer2.MediaMetadata.Builder()
+                            .setTitle(it.displayName)
+                            .build()
+                    )
+                    .build()
+            }
+
+            VideoPlayerManager.setQueue(exoItems)
             val index = items.indexOf(item)
             if (index >= 0) VideoPlayerManager.jumpTo(index)
-
-            com.bytecoder.vplay.player.PlayerLauncher.play(
-                context = it.context,
-                fileOrUrl = item.uri.path ?: "",
-                title = item.displayName
-            )
 
             onClick(item)
         }
@@ -92,7 +96,8 @@ class VideoAdapter(
                 contentResolver.loadThumbnail(item.uri, Size(320, 320), null)
             } else {
                 val retriever = MediaMetadataRetriever()
-                retriever.setDataSource(itemViewCR(), item.uri)
+                val pfd = contentResolver.openFileDescriptor(item.uri, "r")
+                pfd?.fileDescriptor?.let { retriever.setDataSource(it) }
                 val bmp = retriever.frameAtTime
                 retriever.release()
                 bmp

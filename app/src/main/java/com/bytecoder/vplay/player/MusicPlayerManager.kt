@@ -37,7 +37,6 @@ object MusicPlayerManager {
     val uris: MutableList<Uri> = mutableListOf()
     val titles: MutableList<String> = mutableListOf()
 
-    // ----------------- ADDED QUEUE SUPPORT -----------------
     private var queueMode = false
     fun enableQueueMode(enable: Boolean) { queueMode = enable }
     fun isInQueueMode() = queueMode
@@ -49,11 +48,9 @@ object MusicPlayerManager {
             player.play()
         } else {
             player.stop()
-            // optionally show a toast
             Log.w("MusicPlayerManager", "Queue finished or item cannot play")
         }
     }
-    // -------------------------------------------------------
 
     suspend fun ensureInitialized(appContext: Context) {
         if (player != null) return
@@ -114,7 +111,6 @@ object MusicPlayerManager {
 
         notificationManager?.setPlayer(exo)
 
-        // MediaSessionConnector to wire actions and queue
         mediaSessionConnector = MediaSessionConnector(mediaSession!!)
         mediaSessionConnector?.setPlayer(exo)
 
@@ -122,7 +118,6 @@ object MusicPlayerManager {
             notificationManager?.setMediaSessionToken(token)
         }
 
-        // ----------------- ADDED: Player error listener -----------------
         exo.addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
                 if (queueMode) handleQueueError(exo, error)
@@ -131,7 +126,6 @@ object MusicPlayerManager {
                 }
             }
         })
-        // -----------------------------------------------------------------
     }
 
     fun setPlaylist(newUris: List<Uri>, newTitles: List<String>, startIndex: Int = 0) {
@@ -141,6 +135,19 @@ object MusicPlayerManager {
         val items = uris.map { MediaItem.fromUri(it) }
         p.setMediaItems(items, startIndex, 0)
         p.prepare()
+        p.playWhenReady = true
+    }
+
+    fun setMediaItem(item: MediaItem, playWhenReady: Boolean = true) {
+        val p = player ?: return
+        p.setMediaItem(item)
+        p.prepare()
+        p.playWhenReady = playWhenReady
+
+        uris.clear()
+        titles.clear()
+        uris.add(item.localConfiguration?.uri ?: Uri.EMPTY)
+        titles.add(item.mediaMetadata.title?.toString() ?: "Unknown")
     }
 
     fun jumpTo(index: Int) {

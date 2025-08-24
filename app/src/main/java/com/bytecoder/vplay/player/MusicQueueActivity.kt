@@ -16,14 +16,11 @@ class MusicQueueActivity : AppCompatActivity() {
         binding = ActivityQueueBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Keep toolbar back navigation intact
         binding.toolbar.setNavigationOnClickListener { finish() }
 
-        // ------------------- GET CURRENT PLAYLIST -------------------
         val currentIndex = intent.getIntExtra("currentIndex", 0)
         val playlistItems = MusicPlayerManager.uris.mapIndexed { i, uri ->
             val title = MusicPlayerManager.titles.getOrNull(i) ?: uri.lastPathSegment ?: "Item $i"
-            // Using simplified MediaItem for adapter; extra fields (folderName, duration) are optional
             MediaItem.Builder()
                 .setUri(uri)
                 .setMediaMetadata(
@@ -32,15 +29,11 @@ class MusicQueueActivity : AppCompatActivity() {
                         .build()
                 )
                 .build()
-        }
-        // -------------------------------------------------------------
-
-        // ------------------- ADAPTER SETUP -------------------
+        }.toMutableList()
         adapter = MusicQueueAdapter(
-            items = playlistItems.toMutableList(),
-            contentResolver = contentResolver
+            items = playlistItems
         ) { index ->
-            MusicPlayerManager.jumpTo(index) // Play selected item
+            MusicPlayerManager.jumpTo(index)
             finish()
         }
 
@@ -48,6 +41,5 @@ class MusicQueueActivity : AppCompatActivity() {
 
         binding.recyclerQueue.layoutManager = LinearLayoutManager(this)
         binding.recyclerQueue.adapter = adapter
-        // -----------------------------------------------------
     }
 }

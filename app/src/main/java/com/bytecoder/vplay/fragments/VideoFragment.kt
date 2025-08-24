@@ -45,14 +45,18 @@ class VideoFragment : Fragment() {
             isGrid = isGrid,
             contentResolver = requireContext().contentResolver
         ) { item ->
-            PlayerLauncher.play(
-                requireContext(),
-                fileOrUrl = item.uri.toString(),
-                title = item.displayName
-            )
+            val exoItems = data.map {
+                com.google.android.exoplayer2.MediaItem.Builder()
+                    .setUri(it.uri)
+                    .setMediaMetadata(
+                        com.google.android.exoplayer2.MediaMetadata.Builder()
+                            .setTitle(it.displayName)
+                            .build()
+                    )
+                    .build()
+            }
 
-            // Dynamic queue update
-            VideoPlayerManager.setQueue(data)
+            VideoPlayerManager.setQueue(exoItems)
             val index = data.indexOf(item)
             if (index >= 0) VideoPlayerManager.jumpTo(index)
         }

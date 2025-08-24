@@ -12,7 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
-import com.bytecoder.vplay.model.MediaItem
+import com.google.android.exoplayer2.MediaItem
 import kotlinx.coroutines.*
 
 class VideoQueueAdapter(
@@ -22,6 +22,7 @@ class VideoQueueAdapter(
 ) : RecyclerView.Adapter<VideoQueueAdapter.VH>() {
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
+    private var currentIndex: Int = -1
 
     inner class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.findViewById(R.id.itemTitle)
@@ -37,9 +38,9 @@ class VideoQueueAdapter(
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val item = items[position]
-        holder.title.text = item.displayName
-        holder.subtitle.text = item.folderName
-        holder.thumb.setImageResource(R.drawable.ic_video_placeholder)
+        holder.title.text = item.mediaMetadata.title ?: "Video"
+        holder.subtitle.text = item.mediaMetadata.artist ?: ""
+        holder.thumb.setImageResource(R.drawable.movie_24px)
 
         val currentPos = holder.bindingAdapterPosition
         scope.launch {
@@ -49,7 +50,17 @@ class VideoQueueAdapter(
             }
         }
 
-        holder.itemView.setOnClickListener { onClick(position) }
+        holder.itemView.setBackgroundColor(
+            if (position == currentIndex) 0x3300FF00 else 0x00000000
+        )
+
+        holder.itemView.setOnClickListener {
+            val position = holder.bindingAdapterPosition
+            if (position == RecyclerView.NO_POSITION) return@setOnClickListener
+            currentIndex = position
+            notifyDataSetChanged()
+            onClick(position)
+        }
     }
 
     override fun getItemCount(): Int = items.size
@@ -61,13 +72,14 @@ class VideoQueueAdapter(
     }
 
     private fun loadVideoThumb(item: MediaItem): Bitmap? {
+        val mediaUri = item.localConfiguration?.uri ?: return null
         return try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                contentResolver.loadThumbnail(item.uri, Size(320, 320), null)
+                contentResolver.loadThumbnail(mediaUri, Size(320, 320), null)
             } else {
                 val retriever = MediaMetadataRetriever()
                 retriever.setDataSource(
-                    contentResolver.openFileDescriptor(item.uri, "r")?.fileDescriptor
+                    contentResolver.openFileDescriptor(mediaUri, "r")?.fileDescriptor
                 )
                 val bmp = retriever.frameAtTime
                 retriever.release()

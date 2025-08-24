@@ -76,7 +76,7 @@ class VideoPlayer : AppCompatActivity() {
         VideoPlayerManager.player?.addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
                 if (VideoPlayerManager.isInQueueMode()) {
-                    VideoPlayerManager.handleQueueError(VideoPlayerManager.player!!, error)
+                    VideoPlayerManager.handleQueueError()
                 } else {
                     Toast.makeText(this@VideoPlayer, "Cannot play this file", Toast.LENGTH_SHORT).show()
                     finish()
@@ -122,38 +122,61 @@ class VideoPlayer : AppCompatActivity() {
     private fun setupPlayerAndPlay() {
         VideoPlayerManager.ensureInitialized(this)
 
+        val playlistUris = intent.getStringArrayListExtra("playlistUris")
+        val playlistTitles = intent.getStringArrayListExtra("playlistTitles")
+        if (playlistUris != null && playlistUris.size > 1) {
+            VideoPlayerManager.enableQueueMode(true)
+            val mediaItems = playlistUris.mapIndexed { index, uriString ->
+                val uri = Uri.parse(uriString)
+                val title = playlistTitles?.getOrNull(index) ?: uri.lastPathSegment ?: "Video"
+                MediaItem.Builder()
+                    .setUri(uri)
+                    .setMediaMetadata(MediaMetadata.Builder().setTitle(title).build())
+                    .build()
+            }
+
+            VideoPlayerManager.setQueue(mediaItems)
+            val startIndex = intent.getIntExtra("startIndex", 0)
+            VideoPlayerManager.jumpTo(startIndex)
+        } else {
+            val url = intent.getStringExtra("url") ?: run {
+                Toast.makeText(this, "No video URL", Toast.LENGTH_SHORT).show()
+                finish()
+                return
+            }
+
+            val title = intent.getStringExtra("title") ?: Uri.parse(url).lastPathSegment ?: "Video"
+
+            val subtitleUrl = intent.getStringExtra("subtitle_url")
+            val mediaItemBuilder = MediaItem.Builder()
+                .setUri(url)
+                .setMediaMetadata(MediaMetadata.Builder().setTitle(title).build())
+
+            if (!subtitleUrl.isNullOrBlank()) {
+                val subs = MediaItem.SubtitleConfiguration.Builder(Uri.parse(subtitleUrl))
+                    .setMimeType(MimeTypes.TEXT_VTT)
+                    .setLanguage("en")
+                    .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
+                    .build()
+                mediaItemBuilder.setSubtitleConfigurations(listOf(subs))
+            }
+
+            val mediaItem = mediaItemBuilder.build()
+            VideoPlayerManager.setMediaItem(mediaItem, playWhenReady = true)
+            VideoPlaybackService.startForeground(this, title)
+        }
+
         playerView.player = VideoPlayerManager.player
         playerView.controllerShowTimeoutMs = 3000
         playerView.controllerHideOnTouch = true
 
-        val url = intent.getStringExtra("url") ?: run {
-            Toast.makeText(this, "No video URL", Toast.LENGTH_SHORT).show()
-            finish()
-            return
-        }
-
-        val title = intent.getStringExtra("title") ?: Uri.parse(url).lastPathSegment ?: "Video"
-
-        val subtitleUrl = intent.getStringExtra("subtitle_url")
-        val mediaItemBuilder = MediaItem.Builder()
-            .setUri(url)
-            .setMediaMetadata(MediaMetadata.Builder().setTitle(title).build())
-
-        if (!subtitleUrl.isNullOrBlank()) {
-            val subs = MediaItem.SubtitleConfiguration.Builder(Uri.parse(subtitleUrl))
-                .setMimeType(MimeTypes.TEXT_VTT)
-                .setLanguage("en")
-                .setSelectionFlags(C.SELECTION_FLAG_DEFAULT)
-                .build()
-            mediaItemBuilder.setSubtitleConfigurations(listOf(subs))
-        }
-
-        val mediaItem = mediaItemBuilder.build()
-        VideoPlayerManager.setMediaItem(mediaItem, playWhenReady = true)
-
-        VideoPlaybackService.startForeground(this, title)
-
         uiHandler.post(timeUpdate)
+
+        VideoPlayerManager.player?.addListener(object : Player.Listener {
+            override fun onMediaItemTransition(item: MediaItem?, reason: Int) {
+                tvTitle.text = item?.mediaMetadata?.title ?: getString(R.string.app_name)
+            }
+        })
     }
 
     override fun onStart() {

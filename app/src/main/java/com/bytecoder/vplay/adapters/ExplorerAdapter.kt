@@ -49,7 +49,7 @@ class ExplorerAdapter(
                     // Play audio/video files
                     PlayerLauncher.play(
                         context = it.context,
-                        fileOrUrl = file.path,
+                        path = file.path,
                         title = file.name
                     )
                 } else {

@@ -68,6 +68,11 @@
             android:name=".player.MusicQueueActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+        <activity
+            android:name=".player.VideoQueueActivity"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
 
         <service
             android:name=".player.VideoPlaybackService"

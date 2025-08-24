@@ -67,7 +67,6 @@ class MainActivity : AppCompatActivity() {
     private fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 }
 
-/** Fragments can implement this to handle Search/Filter/Sort/More clicks */
 interface ActionBarActions {
     fun onSearchClicked() {}
     fun onFilterClicked() {}

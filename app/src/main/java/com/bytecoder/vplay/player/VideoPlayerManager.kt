@@ -24,14 +24,12 @@ object VideoPlayerManager {
     private var connector: MediaSessionConnector? = null
     private var notification: PlayerNotificationManager? = null
 
-    // ----------------- ADDED QUEUE SUPPORT -----------------
     private val queue = mutableListOf<MediaItem>()
     private var currentIndex = 0
     private var queueListener: ((List<MediaItem>) -> Unit)? = null
     private var queueMode = false
     fun enableQueueMode(enable: Boolean) { queueMode = enable }
     fun isInQueueMode() = queueMode
-    // -------------------------------------------------------
 
     fun ensureInitialized(ctx: Context) {
         if (player != null) return
@@ -72,7 +70,6 @@ object VideoPlayerManager {
 
         notification?.setPlayer(p)
 
-        // ----------------- ADDED: Player error listener for queue -----------------
         p.addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
                 if (queueMode) handleQueueError()
@@ -85,10 +82,9 @@ object VideoPlayerManager {
                 currentIndex = player?.currentMediaItemIndex ?: 0
             }
         })
-        // ------------------------------------------------------------------------
     }
 
-    private fun handleQueueError() {
+    fun handleQueueError() {
         val nextIndex = currentIndex + 1
         if (nextIndex < queue.size) {
             jumpTo(nextIndex)
@@ -128,12 +124,16 @@ object VideoPlayerManager {
         }
     }
 
-    // ----------------- QUEUE MANAGEMENT -----------------
     fun setQueue(list: List<MediaItem>) {
         queue.clear()
         queue.addAll(list)
         currentIndex = 0
         queueListener?.invoke(queue)
+
+        val p = player ?: return
+        p.setMediaItems(queue)
+        p.prepare()
+        p.playWhenReady = true
     }
 
     fun getQueue(): List<MediaItem> = queue.toList()
@@ -141,7 +141,9 @@ object VideoPlayerManager {
     fun jumpTo(index: Int) {
         if (index in queue.indices) {
             currentIndex = index
-            setMediaItem(queue[index], true)
+            val p = player ?: return
+            p.seekTo(index, 0)
+            p.playWhenReady = true
         }
     }
 
@@ -150,5 +152,4 @@ object VideoPlayerManager {
     fun setQueueListener(listener: ((List<MediaItem>) -> Unit)?) {
         queueListener = listener
     }
-    // ----------------------------------------------------
 }

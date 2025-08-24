@@ -13,9 +13,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.model.MediaItem
+import com.bytecoder.vplay.player.MusicPlayerManager
+import com.bytecoder.vplay.player.VideoPlayerManager
 import kotlinx.coroutines.*
 
-// --- CHANGED/ADDED: Added onClick integration with PlayerLauncher ---
 class MusicAdapter(
     private var items: List<MediaItem>,
     private var isGrid: Boolean,
@@ -46,20 +47,27 @@ class MusicAdapter(
         holder.title.text = item.displayName
         holder.subtitle.text = item.folderName
 
-        // --- ADDED: Set click listener with PlayerLauncher ---
+
         holder.itemView.setOnClickListener {
-            // Existing onClick preserved
             onClick(item)
 
-            // --- ADDED snippet ---
-            com.bytecoder.vplay.player.PlayerLauncher.play(
-                context = it.context,
-                fileOrUrl = item.uri.path ?: "",
-                title = item.displayName
-            )
+            val exoItems = items.map {
+                com.google.android.exoplayer2.MediaItem.Builder()
+                    .setUri(it.uri)
+                    .setMediaMetadata(
+                        com.google.android.exoplayer2.MediaMetadata.Builder()
+                            .setTitle(it.displayName)
+                            .build()
+                    )
+                    .build()
+            }
+            val uris = items.map { it.uri }
+            val titles = items.map { it.displayName }
+            MusicPlayerManager.setPlaylist(newUris = uris, newTitles = titles)
+            val index = items.indexOf(item)
+            if (index >= 0) MusicPlayerManager.jumpTo(index)
         }
-
-        holder.thumb.setImageResource(android.R.drawable.ic_media_play)
+        holder.thumb.setImageResource(R.drawable.music_note_24px)
 
         val currentPos = holder.bindingAdapterPosition
         scope.launch {

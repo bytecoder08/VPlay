@@ -16,30 +16,23 @@ class VideoQueueActivity : AppCompatActivity() {
         binding = ActivityQueueBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Toolbar back navigation
         binding.toolbar.setNavigationOnClickListener { finish() }
 
-        // ------------------- INITIALIZE ADAPTER -------------------
         val queue = VideoPlayerManager.getQueue()
         adapter = VideoQueueAdapter(queue.toMutableList(), contentResolver) { index ->
-            VideoPlayerManager.jumpTo(index) // Play selected video
-            finish() // Close queue and return to player
+            VideoPlayerManager.jumpTo(index)
+            finish()
         }
 
         binding.recyclerQueue.layoutManager = LinearLayoutManager(this)
         binding.recyclerQueue.adapter = adapter
-        // -----------------------------------------------------------
-
-        // ------------------- DYNAMIC QUEUE UPDATES -------------------
         VideoPlayerManager.setQueueListener { newQueue ->
             adapter.updateQueue(newQueue)
         }
-        // -----------------------------------------------------------
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        // Remove listener to prevent memory leaks
         VideoPlayerManager.setQueueListener(null)
     }
 }

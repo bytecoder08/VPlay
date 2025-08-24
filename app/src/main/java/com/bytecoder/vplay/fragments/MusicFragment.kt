@@ -46,22 +46,21 @@ class MusicFragment : Fragment() {
             contentResolver = requireContext().contentResolver
         ) { item ->
 
-            // --- CHANGED: PlayerLauncher call ---
-            PlayerLauncher.play(
-                requireContext(),
-                fileOrUrl = item.uri.toString(),
-                title = item.displayName
-            )
-
-            // Dynamic queue update for MusicPlayerManager
-            MusicPlayerManager.setPlaylist(
-                newUris = data.map { it.uri },
-                newTitles = data.map { it.displayName }
-            )
-            val index = data.indexOf(item)
-            if (index >= 0) {
-                MusicPlayerManager.jumpTo(index)
+            val exoItems = data.map { media ->
+                com.google.android.exoplayer2.MediaItem.Builder()
+                    .setUri(media.uri)
+                    .setMediaMetadata(
+                        com.google.android.exoplayer2.MediaMetadata.Builder()
+                            .setTitle(media.displayName)
+                            .build()
+                    )
+                    .build()
             }
+            val uris = data.map { it.uri }
+            val titles = data.map { it.displayName }
+            MusicPlayerManager.setPlaylist(newUris = uris, newTitles = titles)
+            val index = data.indexOf(item)
+            if (index >= 0) MusicPlayerManager.jumpTo(index)
         }
 
         setupRecycler()

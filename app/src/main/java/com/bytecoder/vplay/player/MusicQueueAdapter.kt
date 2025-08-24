@@ -10,13 +10,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
-import com.bytecoder.vplay.model.MediaItem
+import com.google.android.exoplayer2.MediaItem
 import kotlinx.coroutines.*
 
-class
-MusicQueueAdapter(
+class MusicQueueAdapter(
     private val items: MutableList<MediaItem>,
-    private val contentResolver: ContentResolver,
     private val onClick: (Int) -> Unit
 ) : RecyclerView.Adapter<MusicQueueAdapter.VH>() {
 
@@ -37,14 +35,14 @@ MusicQueueAdapter(
 
     override fun onBindViewHolder(holder: VH, position: Int) {
         val item = items[position]
-        holder.title.text = item.displayName
-        holder.subtitle.text = item.folderName
+        holder.title.text = item.mediaMetadata.title ?: "Unknown"
+        holder.subtitle.text = item.mediaMetadata.artist ?: ""
 
         holder.itemView.setBackgroundColor(
             if (position == currentIndex) 0x3300FF00 else 0x00000000
         )
 
-        holder.thumb.setImageResource(R.drawable.ic_music_placeholder)
+        holder.thumb.setImageResource(R.drawable.music_note_24px)
 
         val currentPos = holder.bindingAdapterPosition
         scope.launch {
@@ -55,6 +53,8 @@ MusicQueueAdapter(
         }
 
         holder.itemView.setOnClickListener {
+            val position = holder.bindingAdapterPosition
+            if (position == RecyclerView.NO_POSITION) return@setOnClickListener
             currentIndex = position
             notifyDataSetChanged()
             onClick(position)
@@ -72,8 +72,9 @@ MusicQueueAdapter(
 
     private fun loadAlbumArt(item: MediaItem): Bitmap? {
         return try {
+            val uri = item.localConfiguration?.uri ?: return null
             val retriever = MediaMetadataRetriever()
-            retriever.setDataSource(contentResolver.openFileDescriptor(item.uri, "r")?.fileDescriptor)
+            retriever.setDataSource(uri.path)
             val art = retriever.embeddedPicture
             retriever.release()
             if (art != null) android.graphics.BitmapFactory.decodeByteArray(art, 0, art.size) else null
