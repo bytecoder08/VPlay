@@ -1,4 +1,4 @@
-package com.bytecoder.vplay.player
+package com.bytecoder.vplay.player.music
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

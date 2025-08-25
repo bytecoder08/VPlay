@@ -1,4 +1,4 @@
-package com.bytecoder.vplay.player
+package com.bytecoder.vplay.player.music
 
 import android.content.Intent
 import android.os.Build
@@ -7,11 +7,11 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.bytecoder.vplay.databinding.MusicPlayerBinding
-import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.PlaybackException
 import kotlinx.coroutines.launch
 import com.bytecoder.vplay.R
+import com.google.android.exoplayer2.MediaItem
 
 class MusicPlayer : AppCompatActivity() {
 
@@ -45,7 +45,6 @@ class MusicPlayer : AppCompatActivity() {
             refreshUiFromPlayer()
         }
 
-        // --- ADDED: Player error handling with queue integration ---
         MusicPlayerManager.player?.addListener(object : Player.Listener {
             override fun onPlayerError(error: PlaybackException) {
                 if (MusicPlayerManager.isInQueueMode()) {
@@ -74,7 +73,7 @@ class MusicPlayer : AppCompatActivity() {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             updatePlayPause()
         }
-        override fun onMediaItemTransition(item: com.google.android.exoplayer2.MediaItem?, reason: Int) {
+        override fun onMediaItemTransition(item: MediaItem?, reason: Int) {
             refreshUiFromPlayer()
         }
     }

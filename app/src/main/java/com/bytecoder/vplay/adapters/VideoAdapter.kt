@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.model.MediaItem
-import com.bytecoder.vplay.player.VideoPlayerManager
+import com.bytecoder.vplay.player.video.VideoPlayerManager
 import kotlinx.coroutines.*
 import java.lang.Exception
 

@@ -1,4 +1,4 @@
-package com.bytecoder.vplay.player
+package com.bytecoder.vplay.player.music
 
 import android.content.Context
 import android.content.Intent

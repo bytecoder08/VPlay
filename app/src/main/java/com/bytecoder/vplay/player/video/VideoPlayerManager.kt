@@ -1,4 +1,4 @@
-package com.bytecoder.vplay.player
+package com.bytecoder.vplay.player.video
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -11,6 +11,7 @@ import com.google.android.exoplayer2.audio.AudioAttributes
 import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import android.support.v4.media.session.MediaSessionCompat
+import android.util.Log
 
 object VideoPlayerManager {
 
@@ -74,7 +75,7 @@ object VideoPlayerManager {
             override fun onPlayerError(error: PlaybackException) {
                 if (queueMode) handleQueueError()
                 else {
-                    android.util.Log.w("VideoPlayerManager", "Playback error: ${error.message}")
+                    Log.w("VideoPlayerManager", "Playback error: ${error.message}")
                 }
             }
 

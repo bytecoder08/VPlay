@@ -3,6 +3,8 @@ package com.bytecoder.vplay.player
 import android.content.Context
 import android.net.Uri
 import android.webkit.MimeTypeMap
+import com.bytecoder.vplay.player.music.MusicPlayerManager
+import com.bytecoder.vplay.player.video.VideoPlayerManager
 import java.io.File
 
 object PlayerLauncher {

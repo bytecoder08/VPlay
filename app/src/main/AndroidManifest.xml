@@ -56,30 +56,30 @@
             android:name=".activities.MainActivity"
             android:exported="true"/>
         <activity
-            android:name=".player.VideoPlayer"
+            android:name=".player.video.VideoPlayer"
             android:exported="false"
             android:configChanges="keyboardHidden|orientation|screenSize"
             android:screenOrientation="sensor" />
         <activity
-            android:name=".player.MusicPlayer"
+            android:name=".player.music.MusicPlayer"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".player.MusicQueueActivity"
+            android:name=".player.music.MusicQueueActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
         <activity
-            android:name=".player.VideoQueueActivity"
+            android:name=".player.video.VideoQueueActivity"
             android:exported="false"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
 
 
         <service
-            android:name=".player.VideoPlaybackService"
+            android:name=".player.video.VideoPlaybackService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback" />
         <service
-            android:name=".player.MusicPlaybackService"
+            android:name=".player.music.MusicPlaybackService"
             android:exported="false"
             android:foregroundServiceType="mediaPlayback">
             <intent-filter>

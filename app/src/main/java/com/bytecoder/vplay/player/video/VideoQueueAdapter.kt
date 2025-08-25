@@ -1,4 +1,4 @@
-package com.bytecoder.vplay.player
+package com.bytecoder.vplay.player.video
 
 import android.content.ContentResolver
 import android.graphics.Bitmap

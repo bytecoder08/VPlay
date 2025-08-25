@@ -1,7 +1,7 @@
-package com.bytecoder.vplay.player
+package com.bytecoder.vplay.player.music
 
-import android.content.ContentResolver
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.view.LayoutInflater
 import android.view.View
@@ -77,7 +77,7 @@ class MusicQueueAdapter(
             retriever.setDataSource(uri.path)
             val art = retriever.embeddedPicture
             retriever.release()
-            if (art != null) android.graphics.BitmapFactory.decodeByteArray(art, 0, art.size) else null
+            if (art != null) BitmapFactory.decodeByteArray(art, 0, art.size) else null
         } catch (_: Exception) { null }
     }
 

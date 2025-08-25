@@ -13,8 +13,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.model.MediaItem
-import com.bytecoder.vplay.player.MusicPlayerManager
-import com.bytecoder.vplay.player.VideoPlayerManager
+import com.bytecoder.vplay.player.music.MusicPlayerManager
 import kotlinx.coroutines.*
 
 class MusicAdapter(

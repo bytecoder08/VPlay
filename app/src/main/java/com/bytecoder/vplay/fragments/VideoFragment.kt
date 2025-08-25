@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -17,9 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.adapters.VideoAdapter
 import com.bytecoder.vplay.model.MediaItem
-import com.bytecoder.vplay.player.PlayerLauncher
-import com.bytecoder.vplay.player.VideoPlayerManager
-import com.bytecoder.vplay.player.VideoQueueActivity
+import com.bytecoder.vplay.player.video.VideoPlayerManager
+import com.bytecoder.vplay.player.video.VideoQueueActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -105,7 +103,6 @@ class VideoFragment : Fragment() {
         }
     }
 
-    // Query MediaStore for videos
     private fun queryVideos(): List<MediaItem> {
         val list = mutableListOf<MediaItem>()
 
@@ -148,7 +145,6 @@ class VideoFragment : Fragment() {
         return list
     }
 
-    // (Optional) Menu – you can hook search/sort here later
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.main_menu, menu)
 

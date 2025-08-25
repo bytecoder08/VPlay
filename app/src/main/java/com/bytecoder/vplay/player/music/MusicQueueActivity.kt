@@ -1,10 +1,11 @@
-package com.bytecoder.vplay.player
+package com.bytecoder.vplay.player.music
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bytecoder.vplay.databinding.ActivityQueueBinding
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.MediaMetadata
 
 class MusicQueueActivity : AppCompatActivity() {
 
@@ -24,7 +25,7 @@ class MusicQueueActivity : AppCompatActivity() {
             MediaItem.Builder()
                 .setUri(uri)
                 .setMediaMetadata(
-                    com.google.android.exoplayer2.MediaMetadata.Builder()
+                    MediaMetadata.Builder()
                         .setTitle(title)
                         .build()
                 )

@@ -1,6 +1,5 @@
-package com.bytecoder.vplay.player
+package com.bytecoder.vplay.player.video
 
-import android.content.ContentResolver
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager

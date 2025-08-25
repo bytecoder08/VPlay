@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.provider.MediaStore
 import android.view.*
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
@@ -17,9 +16,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.adapters.MusicAdapter
 import com.bytecoder.vplay.model.MediaItem
-import com.bytecoder.vplay.player.MusicPlayerManager
-import com.bytecoder.vplay.player.MusicQueueActivity
-import com.bytecoder.vplay.player.PlayerLauncher
+import com.bytecoder.vplay.player.music.MusicPlayerManager
+import com.bytecoder.vplay.player.music.MusicQueueActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext

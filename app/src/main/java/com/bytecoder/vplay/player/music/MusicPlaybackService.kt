@@ -1,4 +1,4 @@
-package com.bytecoder.vplay.player
+package com.bytecoder.vplay.player.music
 
 import android.app.Notification
 import android.app.Service
@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import androidx.media.session.MediaButtonReceiver
+import com.google.android.exoplayer2.MediaItem
 
 class MusicPlaybackService : Service() {
 
@@ -24,7 +25,7 @@ class MusicPlaybackService : Service() {
             MusicPlayerManager.ensureInitialized(applicationContext)
             startForegroundWithNowPlaying()
             MusicPlayerManager.player?.addListener(object : Player.Listener {
-                override fun onMediaItemTransition(item: com.google.android.exoplayer2.MediaItem?, reason: Int) {
+                override fun onMediaItemTransition(item: MediaItem?, reason: Int) {
                     startForegroundWithNowPlaying()
                 }
             })
@@ -41,7 +42,6 @@ class MusicPlaybackService : Service() {
             MusicPlayerManager.setPlaylist(uris, titles, index)
         }
 
-        // Handle media button intents
         MediaButtonReceiver.handleIntent(MusicPlayerManager.mediaSession, intent)
 
         return START_STICKY
@@ -63,7 +63,6 @@ class MusicPlaybackService : Service() {
             .setOngoing(true)
             .build()
 
-        // simple call, cross API levels
         startForeground(MusicPlayerManager.NOTIF_ID, notification)
     }
 
