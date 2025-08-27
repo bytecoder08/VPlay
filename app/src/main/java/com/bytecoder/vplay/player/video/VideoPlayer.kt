@@ -121,13 +121,13 @@ class VideoPlayer : AppCompatActivity() {
     private fun setupPlayerAndPlay() {
         VideoPlayerManager.ensureInitialized(this)
 
-        val playlistUris = intent.getStringArrayListExtra("playlistUris")
-        val playlistTitles = intent.getStringArrayListExtra("playlistTitles")
-        if (playlistUris != null && playlistUris.size > 1) {
+        val queueUris = intent.getStringArrayListExtra("queueUris")
+        val queueTitles = intent.getStringArrayListExtra("queueTitles")
+        if (queueUris != null && queueUris.size > 1) {
             VideoPlayerManager.enableQueueMode(true)
-            val mediaItems = playlistUris.mapIndexed { index, uriString ->
+            val mediaItems = queueUris.mapIndexed { index, uriString ->
                 val uri = Uri.parse(uriString)
-                val title = playlistTitles?.getOrNull(index) ?: uri.lastPathSegment ?: "Video"
+                val title = queueTitles?.getOrNull(index) ?: uri.lastPathSegment ?: "Video"
                 MediaItem.Builder()
                     .setUri(uri)
                     .setMediaMetadata(MediaMetadata.Builder().setTitle(title).build())

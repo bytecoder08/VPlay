@@ -56,7 +56,7 @@ class MusicFragment : Fragment() {
             }
             val uris = data.map { it.uri }
             val titles = data.map { it.displayName }
-            MusicPlayerManager.setPlaylist(newUris = uris, newTitles = titles)
+            MusicPlayerManager.setQueue(newUris = uris, newTitles = titles)
             val index = data.indexOf(item)
             if (index >= 0) MusicPlayerManager.jumpTo(index)
         }

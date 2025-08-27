@@ -20,7 +20,7 @@ class MusicQueueActivity : AppCompatActivity() {
         binding.toolbar.setNavigationOnClickListener { finish() }
 
         val currentIndex = intent.getIntExtra("currentIndex", 0)
-        val playlistItems = MusicPlayerManager.uris.mapIndexed { i, uri ->
+        val queueItems = MusicPlayerManager.uris.mapIndexed { i, uri ->
             val title = MusicPlayerManager.titles.getOrNull(i) ?: uri.lastPathSegment ?: "Item $i"
             MediaItem.Builder()
                 .setUri(uri)
@@ -32,13 +32,13 @@ class MusicQueueActivity : AppCompatActivity() {
                 .build()
         }.toMutableList()
         adapter = MusicQueueAdapter(
-            items = playlistItems
+            items = queueItems
         ) { index ->
             MusicPlayerManager.jumpTo(index)
             finish()
         }
 
-        adapter.updateQueue(playlistItems, currentIndex)
+        adapter.updateQueue(queueItems, currentIndex)
 
         binding.recyclerQueue.layoutManager = LinearLayoutManager(this)
         binding.recyclerQueue.adapter = adapter

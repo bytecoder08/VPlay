@@ -39,7 +39,7 @@ class MusicPlaybackService : Service() {
 
         if (uriStrs.isNotEmpty()) {
             val uris = uriStrs.map { Uri.parse(it) }
-            MusicPlayerManager.setPlaylist(uris, titles, index)
+            MusicPlayerManager.setQueue(uris, titles, index)
         }
 
         MediaButtonReceiver.handleIntent(MusicPlayerManager.mediaSession, intent)

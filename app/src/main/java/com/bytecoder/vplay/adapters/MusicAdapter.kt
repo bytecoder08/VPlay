@@ -46,7 +46,6 @@ class MusicAdapter(
         holder.title.text = item.displayName
         holder.subtitle.text = item.folderName
 
-
         holder.itemView.setOnClickListener {
             onClick(item)
 
@@ -62,7 +61,7 @@ class MusicAdapter(
             }
             val uris = items.map { it.uri }
             val titles = items.map { it.displayName }
-            MusicPlayerManager.setPlaylist(newUris = uris, newTitles = titles)
+            MusicPlayerManager.setQueue(newUris = uris, newTitles = titles)
             val index = items.indexOf(item)
             if (index >= 0) MusicPlayerManager.jumpTo(index)
         }

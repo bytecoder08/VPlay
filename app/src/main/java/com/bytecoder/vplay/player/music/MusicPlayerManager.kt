@@ -128,7 +128,7 @@ object MusicPlayerManager {
         })
     }
 
-    fun setPlaylist(newUris: List<Uri>, newTitles: List<String>, startIndex: Int = 0) {
+    fun setQueue(newUris: List<Uri>, newTitles: List<String>, startIndex: Int = 0) {
         uris.clear(); uris.addAll(newUris)
         titles.clear(); titles.addAll(newTitles)
         val p = player ?: return

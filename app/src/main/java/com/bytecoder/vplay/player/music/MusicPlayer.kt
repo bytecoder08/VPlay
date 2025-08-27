@@ -24,12 +24,10 @@ class MusicPlayer : AppCompatActivity() {
 
         binding.toolbar.setNavigationOnClickListener { finish() }
 
-        // Read incoming playlist (if any)
         val uris = intent.getStringArrayListExtra(EXTRA_URIS) ?: arrayListOf()
         val titles = intent.getStringArrayListExtra(EXTRA_TITLES) ?: arrayListOf()
         val index = intent.getIntExtra(EXTRA_INDEX, 0)
 
-        // Start foreground service with playlist
         val svc = Intent(this, MusicPlaybackService::class.java).apply {
             putStringArrayListExtra(MusicPlaybackService.EXTRA_URIS, uris)
             putStringArrayListExtra(MusicPlaybackService.EXTRA_TITLES, titles)
