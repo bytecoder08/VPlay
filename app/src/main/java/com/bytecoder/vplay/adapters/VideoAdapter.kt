@@ -61,9 +61,9 @@ class VideoAdapter(
                     .build()
             }
 
-            VideoPlayerManager.setQueue(exoItems)
+//            VideoPlayerManager.setQueue(exoItems)
             val index = items.indexOf(item)
-            if (index >= 0) VideoPlayerManager.jumpTo(index)
+//            if (index >= 0) VideoPlayerManager.jumpTo(index)
 
             onClick(item)
         }

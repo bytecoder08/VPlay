@@ -7,5 +7,7 @@
     <string name="speed">Speed</string>
     <string name="forward">Forward</string>
     <string name="rewind">Rewind</string>
+    <string name="media_title">Media Title</string>
+    <string name="close">Close</string>
 
 </resources>

@@ -103,4 +103,36 @@ object PlayerLauncher {
             }
         }
     }
+
+    // --- Helpers added to centralize launch + index reads ---
+    fun launchMusicPlayer(context: Context, uris: List<Uri>, titles: List<String>, index: Int) {
+        if (index in uris.indices) {
+            val uri = uris[index]
+            val title = titles.getOrNull(index) ?: uri.toString()
+            val exoItem = com.google.android.exoplayer2.MediaItem.Builder()
+                .setUri(uri)
+                .setMediaMetadata(
+                    com.google.android.exoplayer2.MediaMetadata.Builder()
+                        .setTitle(title)
+                        .build()
+                )
+                .build()
+            MusicPlayerManager.setMediaItem(exoItem, playWhenReady = true)
+        }
+    }
+
+    fun launchVideoPlayer(context: Context, mediaItems: List<com.google.android.exoplayer2.MediaItem>, index: Int) {
+        if (index in mediaItems.indices) {
+            val item = mediaItems[index]
+            VideoPlayerManager.setMediaItem(item, playWhenReady = true)
+        }
+    }
+
+    fun getCurrentMusicIndex(): Int {
+        return MusicPlayerManager.player?.currentMediaItemIndex ?: 0
+    }
+
+    fun getCurrentVideoIndex(): Int {
+        return VideoPlayerManager.getCurrentIndex()
+    }
 }

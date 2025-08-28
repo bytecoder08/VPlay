@@ -61,9 +61,9 @@ class MusicAdapter(
             }
             val uris = items.map { it.uri }
             val titles = items.map { it.displayName }
-            MusicPlayerManager.setQueue(newUris = uris, newTitles = titles)
+//            MusicPlayerManager.setQueue(newUris = uris, newTitles = titles)
             val index = items.indexOf(item)
-            if (index >= 0) MusicPlayerManager.jumpTo(index)
+//            if (index >= 0) MusicPlayerManager.jumpTo(index)
         }
         holder.thumb.setImageResource(R.drawable.music_note_24px)
 

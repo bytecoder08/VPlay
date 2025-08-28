@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.adapters.VideoAdapter
 import com.bytecoder.vplay.model.MediaItem
+import com.bytecoder.vplay.player.PlayerLauncher
 import com.bytecoder.vplay.player.video.VideoPlayerManager
 import com.bytecoder.vplay.player.video.VideoQueueActivity
 import kotlinx.coroutines.Dispatchers
@@ -54,9 +55,9 @@ class VideoFragment : Fragment() {
                     .build()
             }
 
-            VideoPlayerManager.setQueue(exoItems)
+//            VideoPlayerManager.setQueue(exoItems)
             val index = data.indexOf(item)
-            if (index >= 0) VideoPlayerManager.jumpTo(index)
+//            if (index >= 0) VideoPlayerManager.jumpTo(index)
         }
 
         setupRecycler()
@@ -151,7 +152,8 @@ class VideoFragment : Fragment() {
         // --- Added: Queue button to open VideoQueueActivity ---
         val queueItem = menu.findItem(R.id.action_queue)
         queueItem?.setOnMenuItemClickListener {
-            val currentIndex = VideoPlayerManager.getCurrentIndex()
+//            val currentIndex = VideoPlayerManager.getCurrentIndex()
+            val currentIndex = PlayerLauncher.getCurrentVideoIndex()
             val intent = Intent(requireContext(), VideoQueueActivity::class.java)
             intent.putExtra("currentIndex", currentIndex)
             startActivity(intent)

@@ -7,15 +7,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.bytecoder.vplay.fragments.OnlineFragment
 import com.bytecoder.vplay.R
-import com.bytecoder.vplay.fragments.ExplorerFragment
 import com.bytecoder.vplay.fragments.OptionsFragment
 import com.bytecoder.vplay.fragments.MusicFragment
 import com.bytecoder.vplay.fragments.PlaylistFragment
 import com.bytecoder.vplay.fragments.VideoFragment
+import com.bytecoder.vplay.utils.LastTabStore
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
 class MainActivity : AppCompatActivity() {
 
+    private lateinit var lastTabStore: LastTabStore
     private lateinit var bottomNav: BottomNavigationView
     private lateinit var actionSearch: ImageButton
     private lateinit var actionFilter: ImageButton
@@ -25,6 +26,15 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+//        lastTabStore = LastTabStore(this)
+//        try {
+//            val lastTab= lastTabStore.getLastTab()
+//            binding.bottomNav.selectedItemId = if (lastTab == 0) R.id.nav_music else R.id.nav_videos
+//            viewPager.currentItem = lastTab
+//        }catch (t: Throwable){
+//
+//        }
 
         bottomNav = findViewById(R.id.bottomNav)
         actionSearch = findViewById(R.id.actionSearch)
@@ -72,4 +82,14 @@ interface ActionBarActions {
     fun onFilterClicked() {}
     fun onSortClicked() {}
     fun onMoreClicked() {}
+
+
+//    lastTabStore.saveLastTab(0) // 0 = Music, 1 = Video
+//    binding.bottomNav.setOnItemSelectedListener { item ->
+//        when (item.itemId) {
+//            R.id.menu_music -> lastTabStore.saveLastTab(0)
+//            R.id.menu_video -> lastTabStore.saveLastTab(1)
+//        }
+//        false
+//    }
 }

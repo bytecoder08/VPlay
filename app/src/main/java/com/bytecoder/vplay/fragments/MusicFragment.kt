@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bytecoder.vplay.R
 import com.bytecoder.vplay.adapters.MusicAdapter
 import com.bytecoder.vplay.model.MediaItem
+import com.bytecoder.vplay.player.PlayerLauncher
 import com.bytecoder.vplay.player.music.MusicPlayerManager
 import com.bytecoder.vplay.player.music.MusicQueueActivity
 import kotlinx.coroutines.Dispatchers
@@ -56,9 +57,9 @@ class MusicFragment : Fragment() {
             }
             val uris = data.map { it.uri }
             val titles = data.map { it.displayName }
-            MusicPlayerManager.setQueue(newUris = uris, newTitles = titles)
+//            MusicPlayerManager.setQueue(newUris = uris, newTitles = titles)
             val index = data.indexOf(item)
-            if (index >= 0) MusicPlayerManager.jumpTo(index)
+//            if (index >= 0) MusicPlayerManager.jumpTo(index)
         }
 
         setupRecycler()
@@ -151,7 +152,8 @@ class MusicFragment : Fragment() {
         // Queue button click listener
         val queueItem = menu.findItem(R.id.action_queue)
         queueItem?.setOnMenuItemClickListener {
-            val currentIndex = MusicPlayerManager.player?.currentMediaItemIndex ?: 0
+//            val currentIndex = MusicPlayerManager.player?.currentMediaItemIndex ?: 0
+            val currentIndex = PlayerLauncher.getCurrentMusicIndex()
             val intent = Intent(requireContext(), MusicQueueActivity::class.java)
             intent.putExtra("currentIndex", currentIndex)
             startActivity(intent)
