@@ -27,14 +27,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        lastTabStore = LastTabStore(this)
-        try {
-            val lastTab= lastTabStore.getLastTab()
-            binding.bottomNav.selectedItemId = if (lastTab == 0) R.id.nav_music else R.id.nav_videos
-            viewPager.currentItem = lastTab
-        }catch (t: Throwable){
-
-        }
+//        lastTabStore = LastTabStore(this)
+//        try {
+//            val lastTab= lastTabStore.getLastTab()
+//            binding.bottomNav.selectedItemId = if (lastTab == 0) R.id.nav_music else R.id.nav_videos
+//            viewPager.currentItem = lastTab
+//        }catch (t: Throwable){
+//
+//        }
 
         bottomNav = findViewById(R.id.bottomNav)
         actionSearch = findViewById(R.id.actionSearch)
@@ -84,12 +84,12 @@ interface ActionBarActions {
     fun onMoreClicked() {}
 
 
-    lastTabStore.saveLastTab(0) // 0 = Music, 1 = Video
-    binding.bottomNav.setOnItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.menu_music -> lastTabStore.saveLastTab(0)
-            R.id.menu_video -> lastTabStore.saveLastTab(1)
-        }
-        false
-    }
+//    lastTabStore.saveLastTab(0) // 0 = Music, 1 = Video
+//    binding.bottomNav.setOnItemSelectedListener { item ->
+//        when (item.itemId) {
+//            R.id.menu_music -> lastTabStore.saveLastTab(0)
+//            R.id.menu_video -> lastTabStore.saveLastTab(1)
+//        }
+//        false
+//    }
 }

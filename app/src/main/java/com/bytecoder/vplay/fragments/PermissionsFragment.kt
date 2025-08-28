@@ -20,20 +20,27 @@ import com.bytecoder.vplay.R
 import com.bytecoder.vplay.activities.GetPermissions
 
 class PermissionsFragment : Fragment() {
-
-    // Mapping to friendly category names
-    private val permissionsMap = mapOf(
-        android.Manifest.permission.INTERNET to "Network",
-        android.Manifest.permission.ACCESS_NETWORK_STATE to "Network",
-        android.Manifest.permission.POST_NOTIFICATIONS to "Notifications",
-        android.Manifest.permission.READ_EXTERNAL_STORAGE to "Storage",
-        android.Manifest.permission.WRITE_EXTERNAL_STORAGE to "Storage",
-        android.Manifest.permission.MANAGE_EXTERNAL_STORAGE to "Storage",
-        android.Manifest.permission.READ_MEDIA_IMAGES to "Photos",
-        android.Manifest.permission.READ_MEDIA_AUDIO to "Audio",
-        android.Manifest.permission.READ_MEDIA_VIDEO to "Video"
-    )
-
+    private val permissionsMap: Map<String, String> by lazy {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+            mapOf(
+                android.Manifest.permission.INTERNET to "Network",
+                android.Manifest.permission.ACCESS_NETWORK_STATE to "Network",
+                android.Manifest.permission.MANAGE_EXTERNAL_STORAGE to "Storage Manage",
+                android.Manifest.permission.READ_EXTERNAL_STORAGE to "Storage Read",
+                android.Manifest.permission.WRITE_EXTERNAL_STORAGE to "Storage Write"
+            )
+        } else {
+            mapOf(
+                android.Manifest.permission.INTERNET to "Network",
+                android.Manifest.permission.ACCESS_NETWORK_STATE to "Network",
+                android.Manifest.permission.MANAGE_EXTERNAL_STORAGE to "Storage Manage",
+                android.Manifest.permission.POST_NOTIFICATIONS to "Notifications",
+                android.Manifest.permission.READ_MEDIA_IMAGES to "Photos",
+                android.Manifest.permission.READ_MEDIA_AUDIO to "Audio",
+                android.Manifest.permission.READ_MEDIA_VIDEO to "Video"
+            )
+        }
+    }
     private lateinit var containerLayout: LinearLayout
 
     override fun onCreateView(
