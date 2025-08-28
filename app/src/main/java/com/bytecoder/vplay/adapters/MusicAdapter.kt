@@ -49,21 +49,21 @@ class MusicAdapter(
         holder.itemView.setOnClickListener {
             onClick(item)
 
-            val exoItems = items.map {
-                com.google.android.exoplayer2.MediaItem.Builder()
-                    .setUri(it.uri)
-                    .setMediaMetadata(
-                        com.google.android.exoplayer2.MediaMetadata.Builder()
-                            .setTitle(it.displayName)
-                            .build()
-                    )
-                    .build()
-            }
-            val uris = items.map { it.uri }
-            val titles = items.map { it.displayName }
-//            MusicPlayerManager.setQueue(newUris = uris, newTitles = titles)
-            val index = items.indexOf(item)
-//            if (index >= 0) MusicPlayerManager.jumpTo(index)
+//            val exoItems = items.map {
+//                com.google.android.exoplayer2.MediaItem.Builder()
+//                    .setUri(it.uri)
+//                    .setMediaMetadata(
+//                        com.google.android.exoplayer2.MediaMetadata.Builder()
+//                            .setTitle(it.displayName)
+//                            .build()
+//                    )
+//                    .build()
+//            }
+//            val uris = items.map { it.uri }
+//            val titles = items.map { it.displayName }
+////            MusicPlayerManager.setQueue(newUris = uris, newTitles = titles)
+//            val index = items.indexOf(item)
+////            if (index >= 0) MusicPlayerManager.jumpTo(index)
         }
         holder.thumb.setImageResource(R.drawable.music_note_24px)
 

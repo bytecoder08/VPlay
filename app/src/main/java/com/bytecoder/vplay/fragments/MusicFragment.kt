@@ -45,21 +45,21 @@ class MusicFragment : Fragment() {
             contentResolver = requireContext().contentResolver
         ) { item ->
 
-            val exoItems = data.map { media ->
-                com.google.android.exoplayer2.MediaItem.Builder()
-                    .setUri(media.uri)
-                    .setMediaMetadata(
-                        com.google.android.exoplayer2.MediaMetadata.Builder()
-                            .setTitle(media.displayName)
-                            .build()
-                    )
-                    .build()
-            }
-            val uris = data.map { it.uri }
-            val titles = data.map { it.displayName }
-//            MusicPlayerManager.setQueue(newUris = uris, newTitles = titles)
-            val index = data.indexOf(item)
-//            if (index >= 0) MusicPlayerManager.jumpTo(index)
+//            val exoItems = data.map { media ->
+//                com.google.android.exoplayer2.MediaItem.Builder()
+//                    .setUri(media.uri)
+//                    .setMediaMetadata(
+//                        com.google.android.exoplayer2.MediaMetadata.Builder()
+//                            .setTitle(media.displayName)
+//                            .build()
+//                    )
+//                    .build()
+//            }
+//            val uris = data.map { it.uri }
+//            val titles = data.map { it.displayName }
+////            MusicPlayerManager.setQueue(newUris = uris, newTitles = titles)
+//            val index = data.indexOf(item)
+////            if (index >= 0) MusicPlayerManager.jumpTo(index)
         }
 
         setupRecycler()
@@ -129,10 +129,10 @@ class MusicFragment : Fragment() {
             null,
             sortOrder
         )?.use { cursor ->
-            val idCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)
-            val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)
-            val bucketIdx = cursor.getColumnIndex(MediaStore.Audio.Media.BUCKET_DISPLAY_NAME)
-            val durCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)
+            val idCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID)////////////////////////
+            val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DISPLAY_NAME)/////////////
+            val bucketIdx = cursor.getColumnIndex(MediaStore.Audio.Media.BUCKET_DISPLAY_NAME)///////////
+            val durCol = cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION)//////////////////
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idCol)
@@ -154,7 +154,7 @@ class MusicFragment : Fragment() {
         queueItem?.setOnMenuItemClickListener {
 //            val currentIndex = MusicPlayerManager.player?.currentMediaItemIndex ?: 0
             val currentIndex = PlayerLauncher.getCurrentMusicIndex()
-            val intent = Intent(requireContext(), MusicQueueActivity::class.java)
+//            val intent = Intent(requireContext(), MusicQueueActivity::class.java)
             intent.putExtra("currentIndex", currentIndex)
             startActivity(intent)
             true

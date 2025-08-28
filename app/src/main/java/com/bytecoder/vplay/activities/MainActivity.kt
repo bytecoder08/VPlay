@@ -27,14 +27,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-//        lastTabStore = LastTabStore(this)
-//        try {
-//            val lastTab= lastTabStore.getLastTab()
-//            binding.bottomNav.selectedItemId = if (lastTab == 0) R.id.nav_music else R.id.nav_videos
-//            viewPager.currentItem = lastTab
-//        }catch (t: Throwable){
-//
-//        }
+        lastTabStore = LastTabStore(this)
+        try {
+            val lastTab= lastTabStore.getLastTab()
+            binding.bottomNav.selectedItemId = if (lastTab == 0) R.id.nav_music else R.id.nav_videos
+            viewPager.currentItem = lastTab
+        }catch (t: Throwable){
+
+        }
 
         bottomNav = findViewById(R.id.bottomNav)
         actionSearch = findViewById(R.id.actionSearch)
@@ -63,6 +63,19 @@ class MainActivity : AppCompatActivity() {
         actionMore.setOnClickListener   { currentFragment()?.onMoreClicked()   ?: toast("More") }
     }
 
+    // Added: handle back navigation to pop fragments and move app to background at root
+    override fun onBackPressed() {
+        try {
+            val navFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+            if (navFragment != null) {
+                val navController = try { androidx.navigation.fragment.NavHostFragment.findNavController(navFragment) } catch (e: Exception) { null }
+                if (navController != null && navController.popBackStack()) { return }
+            }
+            if (supportFragmentManager.backStackEntryCount > 0) { supportFragmentManager.popBackStack(); return }
+            moveTaskToBack(true)
+        } catch (e: Exception) { super.onBackPressed() }
+    }
+
     fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, fragment)
@@ -75,6 +88,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+
+    lastTabStore.saveLastTab(0) // 0 = Music, 1 = Video
+    binding.bottomNav.setOnItemSelectedListener { item ->
+        when (item.itemId) {
+            R.id.menu_music -> lastTabStore.saveLastTab(0)
+            R.id.menu_video -> lastTabStore.saveLastTab(1)
+        }
+        false
+    }
 }
 
 interface ActionBarActions {
@@ -83,13 +105,4 @@ interface ActionBarActions {
     fun onSortClicked() {}
     fun onMoreClicked() {}
 
-
-//    lastTabStore.saveLastTab(0) // 0 = Music, 1 = Video
-//    binding.bottomNav.setOnItemSelectedListener { item ->
-//        when (item.itemId) {
-//            R.id.menu_music -> lastTabStore.saveLastTab(0)
-//            R.id.menu_video -> lastTabStore.saveLastTab(1)
-//        }
-//        false
-//    }
 }

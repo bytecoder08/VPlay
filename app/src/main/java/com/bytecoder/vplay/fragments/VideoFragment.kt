@@ -44,20 +44,20 @@ class VideoFragment : Fragment() {
             isGrid = isGrid,
             contentResolver = requireContext().contentResolver
         ) { item ->
-            val exoItems = data.map {
-                com.google.android.exoplayer2.MediaItem.Builder()
-                    .setUri(it.uri)
-                    .setMediaMetadata(
-                        com.google.android.exoplayer2.MediaMetadata.Builder()
-                            .setTitle(it.displayName)
-                            .build()
-                    )
-                    .build()
-            }
-
-//            VideoPlayerManager.setQueue(exoItems)
-            val index = data.indexOf(item)
-//            if (index >= 0) VideoPlayerManager.jumpTo(index)
+//            val exoItems = data.map {
+//                com.google.android.exoplayer2.MediaItem.Builder()
+//                    .setUri(it.uri)
+//                    .setMediaMetadata(
+//                        com.google.android.exoplayer2.MediaMetadata.Builder()
+//                            .setTitle(it.displayName)
+//                            .build()
+//                    )
+//                    .build()
+//            }
+//
+////            VideoPlayerManager.setQueue(exoItems)
+//            val index = data.indexOf(item)
+////            if (index >= 0) VideoPlayerManager.jumpTo(index)
         }
 
         setupRecycler()
@@ -129,10 +129,10 @@ class VideoFragment : Fragment() {
             null,
             sortOrder
         )?.use { cursor ->
-            val idCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)
-            val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)
-            val bucketCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)
-            val durCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)
+            val idCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media._ID)/////////////////////////
+            val nameCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DISPLAY_NAME)//////////////
+            val bucketCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.BUCKET_DISPLAY_NAME)/////
+            val durCol = cursor.getColumnIndexOrThrow(MediaStore.Video.Media.DURATION)///////////////////
 
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idCol)
@@ -154,7 +154,7 @@ class VideoFragment : Fragment() {
         queueItem?.setOnMenuItemClickListener {
 //            val currentIndex = VideoPlayerManager.getCurrentIndex()
             val currentIndex = PlayerLauncher.getCurrentVideoIndex()
-            val intent = Intent(requireContext(), VideoQueueActivity::class.java)
+//            val intent = Intent(requireContext(), VideoQueueActivity::class.java)
             intent.putExtra("currentIndex", currentIndex)
             startActivity(intent)
             true
