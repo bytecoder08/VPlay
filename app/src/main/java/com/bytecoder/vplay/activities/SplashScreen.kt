@@ -13,6 +13,17 @@ class SplashScreen : AppCompatActivity() {
     private lateinit var binding: SplashScreenBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        try {
+            val perms = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            val missing = perms.any { androidx.core.content.ContextCompat.checkSelfPermission(this, it) != android.content.pm.PackageManager.PERMISSION_GRANTED }
+            if (missing) {
+                val i = android.content.Intent(this, GetPermissions::class.java)
+                startActivity(i)
+                finish()
+                return
+            }
+        } catch (e: Exception) { }
+
         super.onCreate(savedInstanceState)
         binding = SplashScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
@@ -22,8 +33,6 @@ class SplashScreen : AppCompatActivity() {
 
     private fun startSplashAnimation() {
         val appName = binding.appName
-        // val logo = binding.logo   // logo animation is commented
-        // val rootLayout = binding.rootLayout
 
         // 1. Fade in text
         val fadeIn = ObjectAnimator.ofFloat(appName, View.ALPHA, 0f, 1f).apply {
@@ -41,34 +50,6 @@ class SplashScreen : AppCompatActivity() {
             interpolator = AccelerateDecelerateInterpolator()
             duration = 1200
         }
-
-        // --- Commented out logo animation ---
-        /*
-        val logoAnim = AnimatorSet().apply {
-            playTogether(
-                ObjectAnimator.ofFloat(logo, View.SCALE_X, 0f, 1f),
-                ObjectAnimator.ofFloat(logo, View.SCALE_Y, 0f, 1f),
-                ObjectAnimator.ofFloat(logo, View.ROTATION, 0f, 360f)
-            )
-            interpolator = AccelerateDecelerateInterpolator()
-            duration = 1200
-        }
-        logoAnim.addListener(object : AnimatorListenerAdapter() {
-            override fun onAnimationStart(animation: Animator) {
-                logo.visibility = View.VISIBLE
-            }
-        })
-
-        val ripple = ValueAnimator.ofFloat(0f, 1f).apply {
-            duration = 1200
-            addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator) {
-                    startActivity(Intent(this@SplashScreen, Homepage::class.java))
-                    finish()
-                }
-            })
-        }
-        */
 
         // End animation → directly go to Homepage
         textAnim.addListener(object : AnimatorListenerAdapter() {
