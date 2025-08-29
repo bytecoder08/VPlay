@@ -52,7 +52,7 @@ class GetPermissionsActivity : AppCompatActivity() {
         }
     }
     private fun showSuccessMessage() {
-        tvPermissionInfo.text = "All required permissions granted! \uD83C\uDF89"
+        tvPermissionInfo.text = "All required permissions granted! \uD83C\uDF89 \n -> Use skip to go back."
         tvPermissionInfo.setTextColor(ContextCompat.getColor(this, android.R.color.holo_green_dark))
         tvPermissionInfo.setTypeface(null, Typeface.BOLD)
         tvPermissionInfo.textSize = 18f
