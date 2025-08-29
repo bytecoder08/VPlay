@@ -154,7 +154,7 @@ class MusicFragment : Fragment() {
         queueItem?.setOnMenuItemClickListener {
 //            val currentIndex = MusicPlayerManager.player?.currentMediaItemIndex ?: 0
             val currentIndex = PlayerLauncher.getCurrentMusicIndex()
-//            val intent = Intent(requireContext(), MusicQueueActivity::class.java)
+            val intent = Intent(requireContext(), MusicQueueActivity::class.java)
             intent.putExtra("currentIndex", currentIndex)
             startActivity(intent)
             true

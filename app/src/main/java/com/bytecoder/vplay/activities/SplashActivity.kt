@@ -8,7 +8,7 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
 import com.bytecoder.vplay.databinding.SplashScreenBinding
 
-class SplashScreen : AppCompatActivity() {
+class SplashActivity : AppCompatActivity() {
 
     private lateinit var binding: SplashScreenBinding
 
@@ -17,7 +17,7 @@ class SplashScreen : AppCompatActivity() {
             val perms = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
             val missing = perms.any { androidx.core.content.ContextCompat.checkSelfPermission(this, it) != android.content.pm.PackageManager.PERMISSION_GRANTED }
             if (missing) {
-                val i = android.content.Intent(this, GetPermissions::class.java)
+                val i = android.content.Intent(this, GetPermissionsActivity::class.java)
                 startActivity(i)
                 finish()
                 return
@@ -54,7 +54,7 @@ class SplashScreen : AppCompatActivity() {
         // End animation → directly go to Homepage
         textAnim.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
-                startActivity(Intent(this@SplashScreen, MainActivity::class.java))
+                startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                 finish()
             }
         })

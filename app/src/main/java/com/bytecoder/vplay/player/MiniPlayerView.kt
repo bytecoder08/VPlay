@@ -1,8 +1,6 @@
 package com.bytecoder.vplay.player
 
 import android.content.Context
-import android.os.Handler
-import android.os.Looper
 import android.view.animation.DecelerateInterpolator
 import android.util.AttributeSet
 import android.view.LayoutInflater
@@ -17,9 +15,6 @@ import com.bytecoder.vplay.R
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.PlayerView
-import com.bytecoder.vplay.player.music.MusicPlayerManager
-import com.bytecoder.vplay.player.video.VideoPlayerManager
-import com.bytecoder.vplay.player.PlayerLauncher
 
 class MiniPlayerView @JvmOverloads constructor(
     context: Context,
@@ -64,7 +59,7 @@ class MiniPlayerView @JvmOverloads constructor(
     private var updateListener: (() -> Unit)? = null
 
     init {
-        root = LayoutInflater.from(context).inflate(R.layout.mini_player, this, true)
+        root = LayoutInflater.from(context).inflate(R.layout.view_mini_player, this, true)
         titleView = root.findViewById(R.id.mini_title)
         thumbImage = root.findViewById(R.id.mini_thumb)
         playerView = root.findViewById(R.id.mini_player_view)

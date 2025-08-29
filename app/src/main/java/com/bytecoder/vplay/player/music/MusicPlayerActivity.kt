@@ -14,7 +14,7 @@ import com.bytecoder.vplay.R
 import com.google.android.exoplayer2.MediaItem
 import com.bytecoder.vplay.player.PlayerLauncher
 
-class MusicPlayer : AppCompatActivity() {
+class MusicPlayerActivity : AppCompatActivity() {
 
     private lateinit var binding: MusicPlayerBinding
 
@@ -49,7 +49,7 @@ class MusicPlayer : AppCompatActivity() {
                 if (MusicPlayerManager.isInQueueMode()) {
                     MusicPlayerManager.handleQueueError(MusicPlayerManager.player!!, error)
                 } else {
-                    Toast.makeText(this@MusicPlayer, "Cannot play this audio", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@MusicPlayerActivity, "Cannot play this audio", Toast.LENGTH_SHORT).show()
                     finish()
                 }
             }

@@ -17,7 +17,7 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.bytecoder.vplay.R
-import com.bytecoder.vplay.activities.GetPermissions
+import com.bytecoder.vplay.activities.GetPermissionsActivity
 
 class PermissionsFragment : Fragment() {
     private val permissionsMap: Map<String, String> by lazy {
@@ -56,7 +56,7 @@ class PermissionsFragment : Fragment() {
         containerLayout = view.findViewById(R.id.permissionsContainer)
 
         view.findViewById<Button>(R.id.btnAllowPermissions).setOnClickListener {
-            startActivity(Intent(requireContext(), GetPermissions::class.java))
+            startActivity(Intent(requireContext(), GetPermissionsActivity::class.java))
         }
 
         updatePermissionsList()

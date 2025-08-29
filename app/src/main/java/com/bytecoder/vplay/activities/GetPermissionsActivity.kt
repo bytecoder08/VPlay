@@ -15,7 +15,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.bytecoder.vplay.R
 
-class GetPermissions : AppCompatActivity() {
+class GetPermissionsActivity : AppCompatActivity() {
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -30,7 +30,7 @@ class GetPermissions : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.get_permissions)
+        setContentView(R.layout.activity_get_permissions)
 
         findViewById<Button>(R.id.btnGrantPermissions).setOnClickListener {
             checkAndRequestPermissions()

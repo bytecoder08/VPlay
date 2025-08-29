@@ -24,14 +24,14 @@ class VideoPlaybackService : Service() {
         VideoPlayerManager.ensureInitialized(this)
         VideoPlayerManager.attachPlayer(exo)
     }
-    scope.launch {
-        startForegroundWithNowPlaying()
-    }
-    exo.addListener(object : Player.Listener {
-        override fun onMediaItemTransition(item: MediaItem?, reason: Int) {
-            startForegroundWithNowPlaying()
-        }
-    })
+//    scope.launch {
+//        startForegroundWithNowPlaying()
+//    }
+//    exo.addListener(object : Player.Listener {
+//        override fun onMediaItemTransition(item: MediaItem?, reason: Int) {
+//            startForegroundWithNowPlaying()
+//        }
+//    })
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val title = intent?.getStringExtra(EXTRA_TITLE) ?: getString(R.string.app_name)
         startForegroundWith(title)

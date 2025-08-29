@@ -154,7 +154,7 @@ class VideoFragment : Fragment() {
         queueItem?.setOnMenuItemClickListener {
 //            val currentIndex = VideoPlayerManager.getCurrentIndex()
             val currentIndex = PlayerLauncher.getCurrentVideoIndex()
-//            val intent = Intent(requireContext(), VideoQueueActivity::class.java)
+            val intent = Intent(requireContext(), VideoQueueActivity::class.java)
             intent.putExtra("currentIndex", currentIndex)
             startActivity(intent)
             true

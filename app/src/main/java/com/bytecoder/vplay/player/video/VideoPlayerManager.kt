@@ -161,8 +161,8 @@ object VideoPlayerManager : MiniPlayerView.Host{
     }
 
     override fun isPlaybackActive(): Boolean = try{
-        player != null && player?.currentMediaItem != null || queueUris.isNotEmpty())
-    } catch (_: Throwable) { false }//hasCurrent()
+        player != null && player?.currentMediaItem != null || queueUris.isNotEmpty();
+    } catch (_: Throwable) { false }
 
     override fun getCurrentTitle(): String? = try{
         player?.currentMediaItem?.mediaMetadata?.title?.toString()

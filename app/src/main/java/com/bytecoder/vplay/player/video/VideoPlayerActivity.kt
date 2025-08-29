@@ -25,7 +25,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-class VideoPlayer : AppCompatActivity() {
+class VideoPlayerActivity : AppCompatActivity() {
 
     private lateinit var playerView: PlayerView
     private lateinit var btnFullscreen: ImageButton
@@ -60,7 +60,7 @@ class VideoPlayer : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.video_player)
+        setContentView(R.layout.activity_video_player)
 
         window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
@@ -78,7 +78,7 @@ class VideoPlayer : AppCompatActivity() {
                 if (VideoPlayerManager.isInQueueMode()) {
                     VideoPlayerManager.handleQueueError()
                 } else {
-                    Toast.makeText(this@VideoPlayer, "Cannot play this file", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@VideoPlayerActivity, "Cannot play this file", Toast.LENGTH_SHORT).show()
                     finish()
                 }
             }

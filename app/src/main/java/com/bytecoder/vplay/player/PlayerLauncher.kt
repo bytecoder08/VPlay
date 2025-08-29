@@ -6,8 +6,8 @@ import android.net.Uri
 import android.webkit.MimeTypeMap
 import com.bytecoder.vplay.player.music.MusicPlayerManager
 import com.bytecoder.vplay.player.video.VideoPlayerManager
-import com.bytecoder.vplay.player.music.MusicPlayer
-import com.bytecoder.vplay.player.video.VideoPlayer
+import com.bytecoder.vplay.player.music.MusicPlayerActivity
+import com.bytecoder.vplay.player.video.VideoPlayerActivity
 import java.io.File
 
 object PlayerLauncher {
@@ -16,14 +16,14 @@ object PlayerLauncher {
 
     fun launchMusicPlayer(context: Context) {
         fullPlayerActive = true
-        currentPlayer = MusicPlayer::class.java
-        context.startActivity(Intent(context, MusicPlayer::class.java))
+        currentPlayer = MusicPlayerActivity::class.java
+        context.startActivity(Intent(context, MusicPlayerActivity::class.java))
     }
 
     fun launchVideoPlayer(context: Context) {
         fullPlayerActive = true
-        currentPlayer = VideoPlayer::class.java
-        context.startActivity(Intent(context, VideoPlayer::class.java))
+        currentPlayer = VideoPlayerActivity::class.java
+        context.startActivity(Intent(context, VideoPlayerActivity::class.java))
     }
 
     fun onFullPlayerClosed() {
