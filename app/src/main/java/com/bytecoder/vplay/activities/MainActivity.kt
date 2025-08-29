@@ -13,6 +13,9 @@ import com.bytecoder.vplay.fragments.PlaylistFragment
 import com.bytecoder.vplay.fragments.VideoFragment
 import com.bytecoder.vplay.utils.LastTabStore
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.bytecoder.vplay.player.MiniPlayerView
+import com.bytecoder.vplay.player.music.MusicPlayerManager
+import com.bytecoder.vplay.player.video.VideoPlayerManager
 
 class MainActivity : AppCompatActivity() {
 
@@ -23,18 +26,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var actionSort: ImageButton
     private lateinit var actionMore: ImageButton
 
+    private lateinit var miniPlayerView: MiniPlayerView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         lastTabStore = LastTabStore(this)
-        try {
-            val lastTab= lastTabStore.getLastTab()
-            binding.bottomNav.selectedItemId = if (lastTab == 0) R.id.nav_music else R.id.nav_videos
-            viewPager.currentItem = lastTab
-        }catch (t: Throwable){
-
-        }
+//        try {
+//            val lastTab= lastTabStore.getLastTab()
+//            binding.bottomNav.selectedItemId = if (lastTab == 0) R.id.nav_music else R.id.nav_videos
+//            viewPager.currentItem = lastTab
+//        }catch (t: Throwable){
+//
+//        }
 
         bottomNav = findViewById(R.id.bottomNav)
         actionSearch = findViewById(R.id.actionSearch)
@@ -42,6 +48,26 @@ class MainActivity : AppCompatActivity() {
         actionSort = findViewById(R.id.actionSort)
         actionMore = findViewById(R.id.actionMore)
 
+        miniPlayerView = findViewById(R.id.mini_player_view)
+        if (VideoPlayerManager.isPlaybackActive()) {
+            miniPlayerView?.attach(VideoPlayerManager, this)
+        } else {
+            miniPlayerView?.attach(MusicPlayerManager, this)
+        }
+        MusicPlayerManager.subscribePlaybackUpdates {
+            if (MusicPlayerManager.isPlaybackActive()) {
+                runOnUiThread { miniPlayerView.attach(MusicPlayerManager, this) }
+            } else {
+                runOnUiThread { if (!VideoPlayerManager.isPlaybackActive()) miniPlayerView.detach() }
+            }
+        }
+        VideoPlayerManager.subscribePlaybackUpdates {
+            if (VideoPlayerManager.isPlaybackActive()) {
+                runOnUiThread { miniPlayerView.attach(VideoPlayerManager, this) }
+            } else {
+                runOnUiThread { if (!MusicPlayerManager.isPlaybackActive()) miniPlayerView.detach() }
+            }
+        }
         bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
                 R.id.nav_videos    -> loadFragment(VideoFragment())
@@ -64,17 +90,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Added: handle back navigation to pop fragments and move app to background at root
-    override fun onBackPressed() {
-        try {
-            val navFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
-            if (navFragment != null) {
-                val navController = try { androidx.navigation.fragment.NavHostFragment.findNavController(navFragment) } catch (e: Exception) { null }
-                if (navController != null && navController.popBackStack()) { return }
-            }
-            if (supportFragmentManager.backStackEntryCount > 0) { supportFragmentManager.popBackStack(); return }
-            moveTaskToBack(true)
-        } catch (e: Exception) { super.onBackPressed() }
-    }
+//    override fun onBackPressed() {
+//        try {
+//            val navFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment)
+//            if (navFragment != null) {
+//                val navController = try { androidx.navigation.fragment.NavHostFragment.findNavController(navFragment) } catch (e: Exception) { null }
+//                if (navController != null && navController.popBackStack()) { return }
+//            }
+//            if (supportFragmentManager.backStackEntryCount > 0) { supportFragmentManager.popBackStack(); return }
+//            moveTaskToBack(true)
+//        } catch (e: Exception) { super.onBackPressed() }
+//    }
 
     fun loadFragment(fragment: Fragment) {
         supportFragmentManager.beginTransaction()
@@ -89,14 +115,14 @@ class MainActivity : AppCompatActivity() {
 
     private fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
 
-    lastTabStore.saveLastTab(0) // 0 = Music, 1 = Video
-    binding.bottomNav.setOnItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.menu_music -> lastTabStore.saveLastTab(0)
-            R.id.menu_video -> lastTabStore.saveLastTab(1)
-        }
-        false
-    }
+//    lastTabStore.saveLastTab(0) // 0 = Music, 1 = Video
+//    binding.bottomNav.setOnItemSelectedListener { item ->
+//        when (item.itemId) {
+//            R.id.menu_music -> lastTabStore.saveLastTab(0)
+//            R.id.menu_video -> lastTabStore.saveLastTab(1)
+//        }
+//        false
+//    }
 }
 
 interface ActionBarActions {

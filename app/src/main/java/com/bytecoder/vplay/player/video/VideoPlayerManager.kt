@@ -3,6 +3,7 @@ package com.bytecoder.vplay.player.video
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
+import android.net.Uri
 import android.os.Build
 import androidx.core.content.getSystemService
 import com.bytecoder.vplay.R
@@ -12,15 +13,20 @@ import com.google.android.exoplayer2.ext.mediasession.MediaSessionConnector
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import com.bytecoder.vplay.player.MiniPlayerView
+import java.util.concurrent.CopyOnWriteArraySet
 
-object VideoPlayerManager {
+object VideoPlayerManager : MiniPlayerView.Host{
 
     private const val NOTIF_CHANNEL_ID = "vplay_video_channel"
     private const val NOTIF_CHANNEL_NAME = "Video Playback"
     private const val NOTIF_ID = 5234
 
     var player: ExoPlayer? = null
-        private set
+
+    val queueUris: MutableList<Uri> = mutableListOf()
+
+    private val listeners = CopyOnWriteArraySet<() -> Unit>()
     private var mediaSession: MediaSessionCompat? = null
     private var connector: MediaSessionConnector? = null
     private var notification: PlayerNotificationManager? = null
@@ -152,5 +158,76 @@ object VideoPlayerManager {
 
     fun setQueueListener(listener: ((List<MediaItem>) -> Unit)?) {
         queueListener = listener
+    }
+
+    override fun isPlaybackActive(): Boolean = try{
+        player != null && player?.currentMediaItem != null || queueUris.isNotEmpty())
+    } catch (_: Throwable) { false }//hasCurrent()
+
+    override fun getCurrentTitle(): String? = try{
+        player?.currentMediaItem?.mediaMetadata?.title?.toString()
+    } catch (_: Throwable) { null }
+
+    override fun getCurrentMediaUri(): String? = try{
+        player?.currentMediaItem?.localConfiguration?.uri?.toString()
+            ?: queueUris.getOrNull(player?.currentMediaItemIndex ?: 0)?.toString()
+    } catch (_: Throwable) { null }
+
+    override fun isCurrentMediaVideo(): Boolean = true
+    override fun getPlaybackPositionMs(): Long = try{
+        player?.currentPosition ?: 0L
+    } catch (_: Throwable) { 0L }
+    override fun getPlaybackDurationMs(): Long = try { player?.duration ?: 0L } catch (_: Throwable) { 0L }
+    override fun isPlaying(): Boolean = try { player?.isPlaying == true } catch (_: Throwable) { false }
+    override fun togglePlayPause() {
+        try {
+            player?.let { p -> p.playWhenReady = !p.isPlaying }
+            notifyListeners()
+        } catch (_: Throwable) {}
+    }
+    override fun stopAndClearQueue() {
+        try {
+            player?.stop()
+            queueUris.clear()
+            notifyListeners()
+        } catch (_: Throwable) {}
+    }
+
+    override fun openFullPlayer(context: Context) {
+        com.bytecoder.vplay.player.PlayerLauncher.launchVideoPlayer(context)
+    }
+
+//    private val listeners = mutableSetOf<() -> Unit>()
+    override fun subscribePlaybackUpdates(listener: () -> Unit) { listeners.add(listener) }
+    override fun unsubscribePlaybackUpdates(listener: () -> Unit) { listeners.remove(listener) }
+    fun notifyListeners() { listeners.forEach { safeNotify(it) } }
+    private fun safeNotify(fn: () -> Unit) { try { fn() } catch (_: Throwable) {} }
+
+    fun attachPlayer(exo: ExoPlayer) {
+        if (player === exo) return
+        player = exo
+
+        exo.addListener(object : Player.Listener {
+//            override fun onEvents(player: Player, events: Player.Events) {
+//                notifyListeners()
+//            }
+            override fun onIsPlayingChanged(isPlaying: Boolean) { notifyListeners() }
+            override fun onPlaybackStateChanged(state: Int) { notifyListeners() }
+            override fun onMediaItemTransition(item: MediaItem?, reason: Int) { notifyListeners() }
+            override fun onPlayerError(error: PlaybackException) { notifyListeners() }
+        })
+    }
+
+    fun playUrl(context: Context, url: String, title: String? = null, startNow: Boolean = true) {
+        try {
+            val exo = player ?: return
+            exo.stop()
+            exo.clearMediaItems()
+            val item = MediaItem.fromUri(Uri.parse(url))
+            exo.setMediaItem(item)
+            exo.prepare()
+            exo.playWhenReady = startNow
+            notifyListeners()
+        } catch (_: Throwable) {}
     }
 }

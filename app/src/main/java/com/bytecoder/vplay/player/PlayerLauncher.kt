@@ -1,13 +1,38 @@
 package com.bytecoder.vplay.player
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.webkit.MimeTypeMap
 import com.bytecoder.vplay.player.music.MusicPlayerManager
 import com.bytecoder.vplay.player.video.VideoPlayerManager
+import com.bytecoder.vplay.player.music.MusicPlayer
+import com.bytecoder.vplay.player.video.VideoPlayer
 import java.io.File
 
 object PlayerLauncher {
+    private var fullPlayerActive: Boolean = false
+    private var currentPlayer: Class<*>? = null
+
+    fun launchMusicPlayer(context: Context) {
+        fullPlayerActive = true
+        currentPlayer = MusicPlayer::class.java
+        context.startActivity(Intent(context, MusicPlayer::class.java))
+    }
+
+    fun launchVideoPlayer(context: Context) {
+        fullPlayerActive = true
+        currentPlayer = VideoPlayer::class.java
+        context.startActivity(Intent(context, VideoPlayer::class.java))
+    }
+
+    fun onFullPlayerClosed() {
+        fullPlayerActive = false
+        currentPlayer = null
+    }
+
+    fun isFullPlayerActive(): Boolean = fullPlayerActive
+    fun getCurrentPlayerClass(): Class<*>? = currentPlayer
 
     fun play(
         context: Context,

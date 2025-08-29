@@ -17,6 +17,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.bytecoder.vplay.R
+import com.bytecoder.vplay.player.PlayerLauncher
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.PlayerView
 import com.google.android.exoplayer2.util.MimeTypes
@@ -190,6 +191,7 @@ class VideoPlayer : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        PlayerLauncher.onFullPlayerClosed()
     }
 
     private fun toggleFullscreen() {

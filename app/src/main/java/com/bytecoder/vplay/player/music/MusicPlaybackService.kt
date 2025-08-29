@@ -14,6 +14,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import androidx.media.session.MediaButtonReceiver
 import com.google.android.exoplayer2.MediaItem
+import com.google.android.exoplayer2.ExoPlayer
 
 class MusicPlaybackService : Service() {
 
@@ -21,9 +22,17 @@ class MusicPlaybackService : Service() {
 
     override fun onCreate() {
         super.onCreate()
+        val exo = ExoPlayer.Builder(this).build()
+        MusicPlayerManager.attachPlayer(exo)
+        MusicPlayerManager.player = exo
         scope.launch {
             MusicPlayerManager.ensureInitialized(applicationContext)
             startForegroundWithNowPlaying()
+            exo.addListener(object : Player.Listener {
+                override fun onMediaItemTransition(item: MediaItem?, reason: Int) {
+                    startForegroundWithNowPlaying()
+                }
+            })
             MusicPlayerManager.player?.addListener(object : Player.Listener {
                 override fun onMediaItemTransition(item: MediaItem?, reason: Int) {
                     startForegroundWithNowPlaying()

@@ -12,6 +12,7 @@ import com.google.android.exoplayer2.PlaybackException
 import kotlinx.coroutines.launch
 import com.bytecoder.vplay.R
 import com.google.android.exoplayer2.MediaItem
+import com.bytecoder.vplay.player.PlayerLauncher
 
 class MusicPlayer : AppCompatActivity() {
 
@@ -66,7 +67,10 @@ class MusicPlayer : AppCompatActivity() {
         MusicPlayerManager.player?.removeListener(playerListener)
         super.onStop()
     }
-
+    override fun onDestroy() {
+        super.onDestroy()
+        PlayerLauncher.onFullPlayerClosed()
+    }
     private val playerListener = object : Player.Listener {
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             updatePlayPause()

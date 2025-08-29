@@ -1,6 +1,9 @@
 package com.bytecoder.vplay.player
 
 import android.content.Context
+import android.os.Handler
+import android.os.Looper
+import android.view.animation.DecelerateInterpolator
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
@@ -14,6 +17,9 @@ import com.bytecoder.vplay.R
 import com.google.android.exoplayer2.ExoPlayer
 import com.google.android.exoplayer2.MediaItem
 import com.google.android.exoplayer2.ui.PlayerView
+import com.bytecoder.vplay.player.music.MusicPlayerManager
+import com.bytecoder.vplay.player.video.VideoPlayerManager
+import com.bytecoder.vplay.player.PlayerLauncher
 
 class MiniPlayerView @JvmOverloads constructor(
     context: Context,
@@ -31,6 +37,13 @@ class MiniPlayerView @JvmOverloads constructor(
 
     private var exoPlayer: ExoPlayer? = null
     private var isVideoMode = false
+
+    private val animDuration = 300L
+    private val animInterpolator = DecelerateInterpolator(2.0f)
+    private var isAnimatingIn = false
+    private var isAnimatingOut = false
+    private var currentlyShown = false
+
 
     interface Host {
         fun isPlaybackActive(): Boolean
@@ -71,6 +84,14 @@ class MiniPlayerView @JvmOverloads constructor(
         }
         closeBtn.setOnClickListener {
             host?.stopAndClearQueue()
+            hideMini()
+        }
+
+        post {
+            val h = height.takeIf { it > 0 } ?: measuredHeight
+            translationY = h.toFloat()
+            alpha = 0f
+            visibility = View.GONE
         }
     }
 
@@ -82,8 +103,7 @@ class MiniPlayerView @JvmOverloads constructor(
     }
 
     fun detach() {
-        updateListener?.let {
-            host?.unsubscribePlaybackUpdates(it)
+        updateListener?.let { host?.unsubscribePlaybackUpdates(it)
         }
         updateListener = null
         host = null
@@ -92,11 +112,13 @@ class MiniPlayerView @JvmOverloads constructor(
 
     private fun refreshUi() {
         val h = host ?: return
-        if (!h.isPlaybackActive()) {
-            visibility = View.GONE
+        if (!h.isPlaybackActive() || PlayerLauncher.isFullPlayerActive()) {
+            //visibility = View.GONE
+            hideMini()
             return
         }
-        visibility = View.VISIBLE
+        //visibility = View.VISIBLE
+        showMini()
 
         titleView.text = h.getCurrentTitle() ?: context.getString(R.string.media_title)
 
@@ -159,5 +181,69 @@ class MiniPlayerView @JvmOverloads constructor(
         }
         exoPlayer = null
         playerView.player = null
+    }
+
+    private fun showMini() {
+        if (currentlyShown || isAnimatingIn) return
+        isAnimatingOut = false
+        isAnimatingIn = true
+
+        if (visibility != View.VISIBLE) {
+            visibility = View.VISIBLE
+            post {
+                if (translationY <= 0f) {
+                    translationY = (height.takeIf { it > 0 } ?: measuredHeight).toFloat()
+                }
+                animate()
+                    .translationY(0f)     // slide up
+                    .alpha(1f)            // fade in
+                    .setDuration(animDuration)
+                    .setInterpolator(animInterpolator)
+                    .withEndAction {
+                        isAnimatingIn = false
+                        currentlyShown = true
+                    }
+                    .start()
+            }
+        } else {
+            animate()
+                .translationY(0f)
+                .alpha(1f)
+                .setDuration(animDuration)
+                .setInterpolator(animInterpolator)
+                .withEndAction {
+                    isAnimatingIn = false
+                    currentlyShown = true
+                }
+                .start()
+        }
+    }
+
+    private fun hideMini() {
+        if (!currentlyShown || isAnimatingOut) {
+            if (visibility == View.VISIBLE && !isAnimatingOut && !isAnimatingIn) {
+                performHideAnimation()
+            }
+            return
+        }
+        performHideAnimation()
+    }
+
+    private fun performHideAnimation() {
+        isAnimatingOut = true
+        isAnimatingIn = false
+        val endY = (height.takeIf { it > 0 } ?: measuredHeight).toFloat()
+        animate()
+            .translationY(endY)   // slide down
+            .alpha(0f)            // fade out
+            .setDuration(animDuration)
+            .setInterpolator(animInterpolator)
+            .withEndAction {
+                visibility = View.GONE
+                isAnimatingOut = false
+                currentlyShown = false
+                translationY = endY
+            }
+            .start()
     }
 }
