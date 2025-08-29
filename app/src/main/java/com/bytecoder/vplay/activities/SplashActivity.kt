@@ -2,31 +2,36 @@ package com.bytecoder.vplay.activities
 
 import android.animation.*
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
 import android.view.animation.AccelerateDecelerateInterpolator
 import androidx.appcompat.app.AppCompatActivity
-import com.bytecoder.vplay.databinding.SplashScreenBinding
+import androidx.core.content.ContextCompat
+import com.bytecoder.vplay.databinding.ActivitySplashBinding
+import com.bytecoder.vplay.utils.PermissionsHelper
 
 class SplashActivity : AppCompatActivity() {
 
-    private lateinit var binding: SplashScreenBinding
+    private lateinit var binding: ActivitySplashBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        try {
-            val perms = arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            val missing = perms.any { androidx.core.content.ContextCompat.checkSelfPermission(this, it) != android.content.pm.PackageManager.PERMISSION_GRANTED }
-            if (missing) {
-                val i = android.content.Intent(this, GetPermissionsActivity::class.java)
-                startActivity(i)
-                finish()
-                return
-            }
-        } catch (e: Exception) { }
-
         super.onCreate(savedInstanceState)
-        binding = SplashScreenBinding.inflate(layoutInflater)
+        binding = ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        val permissionsHelper = PermissionsHelper(this)
+        val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val isFirstLaunch = prefs.getBoolean("first_launch", true)
+        val anyGranted = permissionsHelper.getRequiredPermissions().any {
+            ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
+        }
+        if (isFirstLaunch || !anyGranted) {
+            prefs.edit().putBoolean("first_launch", false).apply()
+            startActivity(Intent(this, GetPermissionsActivity::class.java))
+            finish()
+            return
+        }
 
         startSplashAnimation()
     }
