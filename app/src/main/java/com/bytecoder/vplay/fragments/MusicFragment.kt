@@ -44,22 +44,6 @@ class MusicFragment : Fragment() {
             isGrid = isGrid,
             contentResolver = requireContext().contentResolver
         ) { item ->
-
-//            val exoItems = data.map { media ->
-//                com.google.android.exoplayer2.MediaItem.Builder()
-//                    .setUri(media.uri)
-//                    .setMediaMetadata(
-//                        com.google.android.exoplayer2.MediaMetadata.Builder()
-//                            .setTitle(media.displayName)
-//                            .build()
-//                    )
-//                    .build()
-//            }
-//            val uris = data.map { it.uri }
-//            val titles = data.map { it.displayName }
-////            MusicPlayerManager.setQueue(newUris = uris, newTitles = titles)
-//            val index = data.indexOf(item)
-////            if (index >= 0) MusicPlayerManager.jumpTo(index)
         }
 
         setupRecycler()

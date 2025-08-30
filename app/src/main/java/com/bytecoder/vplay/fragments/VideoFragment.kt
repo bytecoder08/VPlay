@@ -44,20 +44,6 @@ class VideoFragment : Fragment() {
             isGrid = isGrid,
             contentResolver = requireContext().contentResolver
         ) { item ->
-//            val exoItems = data.map {
-//                com.google.android.exoplayer2.MediaItem.Builder()
-//                    .setUri(it.uri)
-//                    .setMediaMetadata(
-//                        com.google.android.exoplayer2.MediaMetadata.Builder()
-//                            .setTitle(it.displayName)
-//                            .build()
-//                    )
-//                    .build()
-//            }
-//
-////            VideoPlayerManager.setQueue(exoItems)
-//            val index = data.indexOf(item)
-////            if (index >= 0) VideoPlayerManager.jumpTo(index)
         }
 
         setupRecycler()
