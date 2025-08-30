@@ -17,8 +17,8 @@ import com.bytecoder.vplay.R
 import com.bytecoder.vplay.adapters.VideoAdapter
 import com.bytecoder.vplay.model.MediaItem
 import com.bytecoder.vplay.player.PlayerLauncher
-import com.bytecoder.vplay.player.video.VideoPlayerManager
-import com.bytecoder.vplay.player.video.VideoQueueActivity
+//import com.bytecoder.vplay.player.video.VideoPlayerManager
+//import com.bytecoder.vplay.player.video.VideoQueueActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -140,9 +140,9 @@ class VideoFragment : Fragment() {
         queueItem?.setOnMenuItemClickListener {
 //            val currentIndex = VideoPlayerManager.getCurrentIndex()
             val currentIndex = PlayerLauncher.getCurrentVideoIndex()
-            val intent = Intent(requireContext(), VideoQueueActivity::class.java)
-            intent.putExtra("currentIndex", currentIndex)
-            startActivity(intent)
+//            val intent = Intent(requireContext(), VideoQueueActivity::class.java)
+//            intent.putExtra("currentIndex", currentIndex)
+//            startActivity(intent)
             true
         }
 

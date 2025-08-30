@@ -50,20 +50,20 @@ class VideoAdapter(
         holder.thumb.setImageResource(android.R.drawable.ic_media_play)
 
         holder.itemView.setOnClickListener {
-//            val exoItems = items.map {
-//                com.google.android.exoplayer2.MediaItem.Builder()
-//                    .setUri(it.uri)
-//                    .setMediaMetadata(
-//                        com.google.android.exoplayer2.MediaMetadata.Builder()
-//                            .setTitle(it.displayName)
-//                            .build()
-//                    )
-//                    .build()
-//            }
-//
-////            VideoPlayerManager.setQueue(exoItems)
-//            val index = items.indexOf(item)
-////            if (index >= 0) VideoPlayerManager.jumpTo(index)
+            val exoItems = items.map {
+                com.google.android.exoplayer2.MediaItem.Builder()
+                    .setUri(it.uri)
+                    .setMediaMetadata(
+                        com.google.android.exoplayer2.MediaMetadata.Builder()
+                            .setTitle(it.displayName)
+                            .build()
+                    )
+                    .build()
+            }
+
+//            VideoPlayerManager.setQueue(exoItems)
+            val index = items.indexOf(item)
+//            if (index >= 0) VideoPlayerManager.jumpTo(index)
 
             onClick(item)
         }
