@@ -32,7 +32,7 @@ class PlaylistFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_playlist, container, false)
-        recyclerView = view.findViewById(R.id.recyclerPlaylists)
+        recyclerView = view.findViewById(R.id.recyclerPlaylist)
         toggleButton = view.findViewById(R.id.btnToggleView)
 
         setupRecycler()

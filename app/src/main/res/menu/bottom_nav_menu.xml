@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/nav_videos"
-        android:title="Videos"
+    <item android:id="@+id/nav_video"
+        android:title="Video"
         android:icon="@drawable/video_library_24px" />
     <item android:id="@+id/nav_music"
         android:title="Music"
         android:icon="@drawable/library_music_24px" />
-    <item android:id="@+id/nav_playlists"
-        android:title="Playlists"
+    <item android:id="@+id/nav_playlist"
+        android:title="Playlist"
         android:icon="@drawable/playlist_play_24px" />
     <item android:id="@+id/nav_online"
         android:title="Online"

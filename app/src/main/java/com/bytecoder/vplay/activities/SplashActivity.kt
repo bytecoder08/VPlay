@@ -23,10 +23,13 @@ class SplashActivity : AppCompatActivity() {
         val permissionsHelper = PermissionsHelper(this)
         val prefs = getSharedPreferences("app_prefs", MODE_PRIVATE)
         val isFirstLaunch = prefs.getBoolean("first_launch", true)
-        val anyGranted = permissionsHelper.getRequiredPermissions().any {
+
+        val requiredPermissions = permissionsHelper.getRequiredPermissions()
+
+        val noneGranted = requiredPermissions.none {
             ContextCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
         }
-        if (isFirstLaunch || !anyGranted) {
+        if (isFirstLaunch || noneGranted) {
             prefs.edit().putBoolean("first_launch", false).apply()
             startActivity(Intent(this, GetPermissionsActivity::class.java))
             finish()

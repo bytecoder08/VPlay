@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.bytecoder.vplay.databinding.MusicPlayerBinding
+import com.bytecoder.vplay.databinding.ActivityMusicPlayerBinding
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.PlaybackException
 import kotlinx.coroutines.launch
@@ -16,11 +16,11 @@ import com.bytecoder.vplay.player.PlayerLauncher
 
 class MusicPlayerActivity : AppCompatActivity() {
 
-    private lateinit var binding: MusicPlayerBinding
+    private lateinit var binding: ActivityMusicPlayerBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = MusicPlayerBinding.inflate(layoutInflater)
+        binding = ActivityMusicPlayerBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.toolbar.setNavigationOnClickListener { finish() }

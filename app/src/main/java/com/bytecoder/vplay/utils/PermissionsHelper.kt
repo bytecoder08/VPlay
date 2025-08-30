@@ -123,21 +123,19 @@ class PermissionsHelper(private val activity: Activity) {
                 intent.data = Uri.parse("package:${activity.packageName}")
                 activity.startActivity(intent)
             }
-
-        // Only show "All Files Access" on Android 11+
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            builder.setNeutralButton("All Files Access") { _, _ ->
-                try {
-                    val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
-                    intent.data = Uri.parse("package:${activity.packageName}")
-                    activity.startActivity(intent)
-                } catch (e: Exception) {
-                    val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
-                    activity.startActivity(intent)
+            // Only show "All Files Access" on Android 11+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                builder.setNeutralButton("All Files Access") { _, _ ->
+                    try {
+                        val intent = Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION)
+                        intent.data = Uri.parse("package:${activity.packageName}")
+                        activity.startActivity(intent)
+                    } catch (e: Exception) {
+                        val intent = Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION)
+                        activity.startActivity(intent)
+                    }
                 }
             }
-        }
-
         builder.show()
     }
 }

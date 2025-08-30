@@ -11,82 +11,83 @@ import com.bytecoder.vplay.fragments.OptionsFragment
 import com.bytecoder.vplay.fragments.MusicFragment
 import com.bytecoder.vplay.fragments.PlaylistFragment
 import com.bytecoder.vplay.fragments.VideoFragment
-import com.bytecoder.vplay.utils.LastTabStore
+import com.bytecoder.vplay.utils.StorePreference
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.bytecoder.vplay.player.MiniPlayerView
 import com.bytecoder.vplay.player.music.MusicPlayerManager
 import com.bytecoder.vplay.player.video.VideoPlayerManager
+import com.bytecoder.vplay.utils.TabType
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var lastTabStore: LastTabStore
+    private lateinit var lastTabStore: StorePreference
     private lateinit var bottomNav: BottomNavigationView
-    private lateinit var actionSearch: ImageButton
-    private lateinit var actionFilter: ImageButton
-    private lateinit var actionSort: ImageButton
-    private lateinit var actionMore: ImageButton
 
-    private lateinit var miniPlayerView: MiniPlayerView
-
+//    private lateinit var miniPlayerView: MiniPlayerView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        lastTabStore = LastTabStore(this)
-//        try {
-//            val lastTab= lastTabStore.getLastTab()
-//            binding.bottomNav.selectedItemId = if (lastTab == 0) R.id.nav_music else R.id.nav_videos
-//            viewPager.currentItem = lastTab
-//        }catch (t: Throwable){
-//
-//        }
+        lastTabStore = StorePreference(this)
 
         bottomNav = findViewById(R.id.bottomNav)
-        actionSearch = findViewById(R.id.actionSearch)
-        actionFilter = findViewById(R.id.actionFilter)
-        actionSort = findViewById(R.id.actionSort)
-        actionMore = findViewById(R.id.actionMore)
 
-        miniPlayerView = findViewById(R.id.mini_player_view)
-        if (VideoPlayerManager.isPlaybackActive()) {
-            miniPlayerView?.attach(VideoPlayerManager, this)
-        } else {
-            miniPlayerView?.attach(MusicPlayerManager, this)
-        }
-        MusicPlayerManager.subscribePlaybackUpdates {
-            if (MusicPlayerManager.isPlaybackActive()) {
-                runOnUiThread { miniPlayerView.attach(MusicPlayerManager, this) }
-            } else {
-                runOnUiThread { if (!VideoPlayerManager.isPlaybackActive()) miniPlayerView.detach() }
-            }
-        }
-        VideoPlayerManager.subscribePlaybackUpdates {
-            if (VideoPlayerManager.isPlaybackActive()) {
-                runOnUiThread { miniPlayerView.attach(VideoPlayerManager, this) }
-            } else {
-                runOnUiThread { if (!MusicPlayerManager.isPlaybackActive()) miniPlayerView.detach() }
-            }
-        }
+//        miniPlayerView = findViewById(R.id.mini_player_view)
+//        if (VideoPlayerManager.isPlaybackActive()) {
+//            miniPlayerView?.attach(VideoPlayerManager, this)
+//        } else {
+//            miniPlayerView?.attach(MusicPlayerManager, this)
+//        }
+//        MusicPlayerManager.subscribePlaybackUpdates {
+//            if (MusicPlayerManager.isPlaybackActive()) {
+//                runOnUiThread { miniPlayerView.attach(MusicPlayerManager, this) }
+//            } else {
+//                runOnUiThread { if (!VideoPlayerManager.isPlaybackActive()) miniPlayerView.detach() }
+//            }
+//        }
+//        VideoPlayerManager.subscribePlaybackUpdates {
+//            if (VideoPlayerManager.isPlaybackActive()) {
+//                runOnUiThread { miniPlayerView.attach(VideoPlayerManager, this) }
+//            } else {
+//                runOnUiThread { if (!MusicPlayerManager.isPlaybackActive()) miniPlayerView.detach() }
+//            }
+//        }
         bottomNav.setOnItemSelectedListener {
             when (it.itemId) {
-                R.id.nav_videos    -> loadFragment(VideoFragment())
-                R.id.nav_music     -> loadFragment(MusicFragment())
-                R.id.nav_playlists -> loadFragment(PlaylistFragment())
-                R.id.nav_online    -> loadFragment(OnlineFragment())
-                R.id.nav_options   -> loadFragment(OptionsFragment())
+                R.id.nav_video -> {
+                    loadFragment(VideoFragment())
+                    lastTabStore.saveLastTab(TabType.VIDEO)
+                }
+                R.id.nav_music -> {
+                    loadFragment(MusicFragment())
+                    lastTabStore.saveLastTab(TabType.MUSIC)
+                }
+                R.id.nav_playlist -> {
+                    loadFragment(PlaylistFragment())
+                    lastTabStore.saveLastTab(TabType.PLAYLIST)
+                }
+                R.id.nav_online -> {
+                    loadFragment(OnlineFragment())
+                    lastTabStore.saveLastTab(TabType.ONLINE)
+                }
+                R.id.nav_options -> {
+                    loadFragment(OptionsFragment())
+                    lastTabStore.saveLastTab(TabType.OPTIONS)
+                }
             }
             true
         }
 
-        // default tab
-        bottomNav.selectedItemId = R.id.nav_videos
-
-        // Actions row (for now, simple toasts; fragments can override later)
-        actionSearch.setOnClickListener { currentFragment()?.onSearchClicked() ?: toast("Search") }
-        actionFilter.setOnClickListener { currentFragment()?.onFilterClicked() ?: toast("Filter") }
-        actionSort.setOnClickListener   { currentFragment()?.onSortClicked()   ?: toast("Sort") }
-        actionMore.setOnClickListener   { currentFragment()?.onMoreClicked()   ?: toast("More") }
+        // Restore last selected tab
+        when (lastTabStore.getLastTab()) {
+            TabType.VIDEO -> bottomNav.selectedItemId = R.id.nav_video
+            TabType.MUSIC -> bottomNav.selectedItemId = R.id.nav_music
+            TabType.PLAYLIST -> bottomNav.selectedItemId = R.id.nav_playlist
+            TabType.ONLINE -> bottomNav.selectedItemId = R.id.nav_online
+            TabType.OPTIONS -> bottomNav.selectedItemId = R.id.nav_options
+            else -> bottomNav.selectedItemId = R.id.nav_video // default fallback
+        }
     }
 
     // Added: handle back navigation to pop fragments and move app to background at root
@@ -108,27 +109,5 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    private fun currentFragment(): ActionBarActions? {
-        val f = supportFragmentManager.findFragmentById(R.id.fragment_container)
-        return if (f is ActionBarActions) f else null
-    }
-
     private fun toast(msg: String) = Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
-
-//    lastTabStore.saveLastTab(0) // 0 = Music, 1 = Video
-//    binding.bottomNav.setOnItemSelectedListener { item ->
-//        when (item.itemId) {
-//            R.id.menu_music -> lastTabStore.saveLastTab(0)
-//            R.id.menu_video -> lastTabStore.saveLastTab(1)
-//        }
-//        false
-//    }
-}
-
-interface ActionBarActions {
-    fun onSearchClicked() {}
-    fun onFilterClicked() {}
-    fun onSortClicked() {}
-    fun onMoreClicked() {}
-
 }

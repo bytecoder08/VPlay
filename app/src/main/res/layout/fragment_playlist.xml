@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
-        android:title="Videos"
+        android:title="Video"
         android:titleTextColor="@android:color/white" />
 
     <!-- Toggle button + Recycler -->
@@ -25,7 +25,7 @@
         android:background="?attr/selectableItemBackgroundBorderless" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerPlaylists"
+        android:id="@+id/recyclerPlaylist"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="8dp"/>

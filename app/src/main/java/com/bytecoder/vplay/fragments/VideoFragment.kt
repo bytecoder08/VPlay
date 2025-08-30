@@ -36,7 +36,7 @@ class VideoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_video, container, false)
-        recyclerView = view.findViewById(R.id.recyclerVideos)
+        recyclerView = view.findViewById(R.id.recyclerVideo)
         toggleButton = view.findViewById(R.id.btnToggleView)
 
         adapter = VideoAdapter(
@@ -62,7 +62,7 @@ class VideoFragment : Fragment() {
 
         setupRecycler()
         toggleButton.setOnClickListener { toggleLayout() }
-        loadVideos()
+        loadVideo()
 
         return view
     }
@@ -93,10 +93,10 @@ class VideoFragment : Fragment() {
         adapter.setGrid(isGrid)
     }
 
-    private fun loadVideos() {
+    private fun loadVideo() {
         lifecycleScope.launch {
             val items = withContext(Dispatchers.IO) {
-                queryVideos()
+                queryVideo()
             }
             data.clear()
             data.addAll(items)
@@ -104,7 +104,7 @@ class VideoFragment : Fragment() {
         }
     }
 
-    private fun queryVideos(): List<MediaItem> {
+    private fun queryVideo(): List<MediaItem> {
         val list = mutableListOf<MediaItem>()
 
         val collection = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
